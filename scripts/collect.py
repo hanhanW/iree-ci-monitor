@@ -33,17 +33,61 @@ STATE_PATH = DATA_DIR / ".state.json"
 
 RESCAN_HOURS = 2
 INITIAL_BACKFILL_HOURS = 24
-MAX_PAGES = 40  # safety cap on pagination depth
+MAX_PAGES = 60  # safety cap on pagination depth; raises on hit
+MAX_OPEN_AGE_DAYS = 3  # drop tracked open runs older than this
+RATE_LIMIT_MAX_SLEEP_S = 300  # cap any single rate-limit wait
 
 
 def log(msg: str) -> None:
     print(f"[collect] {msg}", flush=True)
 
 
-def gh_request(path: str, params: dict | None = None) -> tuple[dict, dict]:
-    url = f"https://api.github.com{path}"
+def _rate_limit_wait(e: urllib.error.HTTPError) -> int | None:
+    """Return seconds to wait if `e` is a GitHub rate-limit response, else None.
+
+    GitHub uses 403 with `X-RateLimit-Remaining: 0` for the primary limit and
+    may use 429 (or 403 with `Retry-After`) for secondary/abuse limits."""
+    if e.code not in (403, 429):
+        return None
+    retry_after = e.headers.get("Retry-After")
+    if retry_after:
+        try:
+            return min(max(1, int(retry_after)), RATE_LIMIT_MAX_SLEEP_S)
+        except ValueError:
+            return 60
+    if e.headers.get("X-RateLimit-Remaining") == "0":
+        reset = e.headers.get("X-RateLimit-Reset")
+        if reset:
+            try:
+                wait = int(reset) - int(time.time())
+                return max(1, min(wait, RATE_LIMIT_MAX_SLEEP_S))
+            except ValueError:
+                return 60
+    return None
+
+
+def _parse_next_link(link_header: str | None) -> str | None:
+    """Extract the rel=next URL from a GitHub `Link` header, if any."""
+    if not link_header:
+        return None
+    for part in link_header.split(","):
+        segs = [s.strip() for s in part.split(";")]
+        if len(segs) < 2 or not (segs[0].startswith("<") and segs[0].endswith(">")):
+            continue
+        url = segs[0][1:-1]
+        if any(rel == 'rel="next"' for rel in segs[1:]):
+            return url
+    return None
+
+
+def gh_request(path_or_url: str, params: dict | None = None) -> tuple[dict, dict]:
+    if path_or_url.startswith("http"):
+        url = path_or_url
+    else:
+        url = f"https://api.github.com{path_or_url}"
     if params:
-        url += "?" + urllib.parse.urlencode(params)
+        sep = "&" if "?" in url else "?"
+        url += sep + urllib.parse.urlencode(params)
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
         sys.exit("GITHUB_TOKEN not set")
@@ -60,9 +104,15 @@ def gh_request(path: str, params: dict | None = None) -> tuple[dict, dict]:
         try:
             with urllib.request.urlopen(req, timeout=30) as resp:
                 body = json.loads(resp.read())
-                headers = dict(resp.headers)
+                # Lowercase keys so callers don't depend on server's header case.
+                headers = {k.lower(): v for k, v in resp.headers.items()}
                 return body, headers
         except urllib.error.HTTPError as e:
+            wait = _rate_limit_wait(e)
+            if wait is not None and attempt < 2:
+                log(f"rate limited ({e.code}); sleeping {wait}s")
+                time.sleep(wait)
+                continue
             if e.code in (502, 503, 504) and attempt < 2:
                 time.sleep(2 ** attempt)
                 continue
@@ -78,28 +128,30 @@ def gh_request(path: str, params: dict | None = None) -> tuple[dict, dict]:
 def paginate(path: str, params: dict | None = None):
     params = dict(params or {})
     params.setdefault("per_page", 100)
-    params["page"] = 1
-    key = None
+    next_url: str | None = None
+    list_key: str | None = None
     for _ in range(MAX_PAGES):
-        body, _ = gh_request(path, params)
-        if key is None:
-            # Detect list key on first page.
+        if next_url is None:
+            body, headers = gh_request(path, params)
+        else:
+            body, headers = gh_request(next_url)
+        if list_key is None:
             for candidate in ("workflow_runs", "jobs"):
-                if candidate in body:
-                    key = candidate
+                if isinstance(body, dict) and candidate in body:
+                    list_key = candidate
                     break
-            if key is None:
-                # Already a list or unknown shape; just yield whatever.
+            if list_key is None:
                 if isinstance(body, list):
                     yield from body
-                    return
                 return
-        items = body.get(key, [])
-        yield from items
-        if len(items) < params["per_page"]:
+        yield from body.get(list_key, [])
+        next_url = _parse_next_link(headers.get("link"))
+        if not next_url:
             return
-        params["page"] += 1
-    log(f"WARN: hit MAX_PAGES={MAX_PAGES} on {path}")
+    raise RuntimeError(
+        f"hit MAX_PAGES={MAX_PAGES} on {path}; refusing to truncate. "
+        "Bump MAX_PAGES or narrow the query window."
+    )
 
 
 def load_state() -> dict:
@@ -222,7 +274,9 @@ def collect() -> None:
     # Pull jobs per run, grouped by day-bucket.
     by_day: dict[Path, list[dict]] = {}
     still_open: list[int] = []
+    dropped_stale = 0
     max_completed_id = state["last_completed_run_id"]
+    open_age_cutoff = now - timedelta(days=MAX_OPEN_AGE_DAYS)
 
     for rid, run in runs_by_id.items():
         jobs = list(
@@ -237,7 +291,13 @@ def collect() -> None:
         if run.get("status") == "completed":
             max_completed_id = max(max_completed_id, rid)
         else:
-            still_open.append(rid)
+            run_created = parse_iso(run.get("created_at"))
+            # Drop if missing created_at too — otherwise the run sticks in
+            # open_run_ids forever, defeating the age cap.
+            if run_created is None or run_created < open_age_cutoff:
+                dropped_stale += 1
+            else:
+                still_open.append(rid)
 
     # Dedupe + append per day file.
     total_new = 0
@@ -254,7 +314,10 @@ def collect() -> None:
         "open_run_ids": sorted(set(still_open)),
     }
     save_state(state)
-    log(f"state: last_completed={max_completed_id} open={len(still_open)}")
+    log(
+        f"state: last_completed={max_completed_id} open={len(still_open)} "
+        f"dropped_stale={dropped_stale}"
+    )
 
 
 if __name__ == "__main__":

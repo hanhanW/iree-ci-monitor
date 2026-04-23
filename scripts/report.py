@@ -47,7 +47,6 @@ class LabelStats:
     total: int = 0
     queued: int = 0
     in_progress: int = 0
-    main_total: int = 0
     main_ok: int = 0
     main_fail: int = 0
     main_cancelled: int = 0
@@ -225,8 +224,6 @@ def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
                     s.all_cancelled += 1
                     if main:
                         s.main_cancelled += 1
-                if main:
-                    s.main_total += 1
             elif status == "queued" or status == "waiting":
                 s.queued += 1
                 wait = (now - created).total_seconds()
