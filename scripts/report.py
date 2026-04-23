@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import collections
 import json
+import os
 import statistics
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -16,6 +17,7 @@ from pathlib import Path
 from typing import Iterable
 from zoneinfo import ZoneInfo
 
+REPO = os.environ.get("IREE_CI_MONITOR_REPO", "iree-org/iree")
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 README_PATH = ROOT / "README.md"
@@ -55,7 +57,9 @@ class LabelStats:
     all_cancelled: int = 0
     qtimes: list[float] = field(default_factory=list)
     oldest_queued_s: float = 0.0
+    oldest_queued_ref: tuple[int, int] | None = None  # (run_id, job_id)
     oldest_in_progress_s: float = 0.0
+    oldest_in_progress_ref: tuple[int, int] | None = None
     runners: set = field(default_factory=set)
 
     @property
@@ -117,6 +121,15 @@ def _pct(xs: list[float], p: int) -> float:
     xs = sorted(xs)
     k = max(0, min(len(xs) - 1, int(round((p / 100) * (len(xs) - 1)))))
     return xs[k]
+
+
+def fmt_oldest(seconds: float, ref: tuple[int, int] | None) -> str:
+    """Render a duration linked to the responsible job, if known."""
+    txt = fmt_duration(seconds)
+    if ref is None:
+        return txt
+    run_id, job_id = ref
+    return f"[{txt}](https://github.com/{REPO}/actions/runs/{run_id}/job/{job_id})"
 
 
 def fmt_duration(s: float) -> str:
@@ -226,12 +239,16 @@ def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
                         s.main_cancelled += 1
             elif status == "queued" or status == "waiting":
                 s.queued += 1
-                wait = (now - created).total_seconds()
-                s.oldest_queued_s = max(s.oldest_queued_s, wait)
+                wait = max(0.0, (now - created).total_seconds())
+                if s.oldest_queued_ref is None or wait > s.oldest_queued_s:
+                    s.oldest_queued_s = wait
+                    s.oldest_queued_ref = (int(rec["run_id"]), int(rec["job_id"]))
             elif status == "in_progress":
                 s.in_progress += 1
-                wait = (now - created).total_seconds()
-                s.oldest_in_progress_s = max(s.oldest_in_progress_s, wait)
+                wait = max(0.0, (now - created).total_seconds())
+                if s.oldest_in_progress_ref is None or wait > s.oldest_in_progress_s:
+                    s.oldest_in_progress_s = wait
+                    s.oldest_in_progress_ref = (int(rec["run_id"]), int(rec["job_id"]))
 
             rn = rec.get("runner_name")
             if rn:
@@ -361,7 +378,7 @@ def render_readme(
         fr_s = f"{fr:.0%} ({s.main_fail}/{s.main_ok + s.main_fail + s.main_cancelled})" if fr is not None else "—"
         lines.append(
             f"| `{s.label}` | {s.total} | {s.queued} | "
-            f"{fmt_duration(s.oldest_queued_s) if s.queued else '—'} | "
+            f"{fmt_oldest(s.oldest_queued_s, s.oldest_queued_ref) if s.queued else '—'} | "
             f"{s.in_progress} | "
             f"{fmt_duration(s.p50)} | {fmt_duration(s.p95)} | "
             f"{fr_s} | {len(s.runners)} |"
@@ -437,9 +454,9 @@ def render_status(
         max_q = max(s.qtimes) if s.qtimes else 0
         lines.append(
             f"| `{s.label}` | {s.total} | {s.queued} | "
-            f"{fmt_duration(s.oldest_queued_s) if s.queued else '—'} | "
+            f"{fmt_oldest(s.oldest_queued_s, s.oldest_queued_ref) if s.queued else '—'} | "
             f"{s.in_progress} | "
-            f"{fmt_duration(s.oldest_in_progress_s) if s.in_progress else '—'} | "
+            f"{fmt_oldest(s.oldest_in_progress_s, s.oldest_in_progress_ref) if s.in_progress else '—'} | "
             f"{fmt_duration(s.avg)} | {fmt_duration(s.p50)} | {fmt_duration(s.p95)} | "
             f"{fmt_duration(max_q)} | {fr_all_s} | {fr_main_s} | "
             f"{len(s.runners)} | {'yes' if s.label in spof else ''} |"
