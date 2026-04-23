@@ -1,17 +1,18 @@
 # Status detail
 
-_Updated: 2026-04-23T21:33Z_ — watching `iree-org/iree`, window = last 6h
+_Updated: 2026-04-23T22:30Z_ — watching `iree-org/iree`, window = last 6h
 
 ## Alerts
 
-- **[stale-queued]** `Linux,X64,gfx1201,persistent-cache` oldest queued job waiting 3h12m (> 2h00m)
-- **[stale-queued]** `Linux,X64,gfx1201` oldest queued job waiting 4h23m (> 2h00m)
-- **[stale-queued]** `Linux,X64,iree-r9700` oldest queued job waiting 3h35m (> 2h00m)
-- **[stale-queued]** `Linux,X64,iree-w7900` oldest queued job waiting 3h35m (> 2h00m)
-- **[stale-queued]** `Linux,X64,iree-w7900x2,persistent-cache` oldest queued job waiting 3h51m (> 2h00m)
-- **[stale-queued]** `Linux,X64,rdna3,persistent-cache,shark10-ci` oldest queued job waiting 2h42m (> 2h00m)
-- **[stale-queued]** `Linux,X64,rdna3,shark10-ci` oldest queued job waiting 4h23m (> 2h00m)
-- **[stale-queued]** `self-hosted,persistent-cache,Linux,X64,threadripper` oldest queued job waiting 4h23m (> 2h00m)
+- **[stale-queued]** `Linux,X64,gfx1100` oldest queued job waiting 2h09m (> 2h00m)
+- **[stale-queued]** `Linux,X64,gfx1201,persistent-cache` oldest queued job waiting 4h09m (> 2h00m)
+- **[stale-queued]** `Linux,X64,gfx1201` oldest queued job waiting 5h20m (> 2h00m)
+- **[stale-queued]** `Linux,X64,iree-r9700` oldest queued job waiting 4h33m (> 2h00m)
+- **[stale-queued]** `Linux,X64,iree-w7900` oldest queued job waiting 4h33m (> 2h00m)
+- **[stale-queued]** `Linux,X64,iree-w7900x2,persistent-cache` oldest queued job waiting 4h48m (> 2h00m)
+- **[stale-queued]** `Linux,X64,rdna3,persistent-cache,shark10-ci` oldest queued job waiting 3h39m (> 2h00m)
+- **[stale-queued]** `Linux,X64,rdna3,shark10-ci` oldest queued job waiting 5h20m (> 2h00m)
+- **[stale-queued]** `self-hosted,persistent-cache,Linux,X64,threadripper` oldest queued job waiting 5h20m (> 2h00m)
 - **[queue-starved]** `Linux,X64,gfx1100,persistent-cache` p95 queue 1h04m (> 1h00m)
 - **[queue-starved]** `Linux,X64,gfx1100` p95 queue 1h51m (> 1h00m)
 - **[queue-starved]** `Linux,X64,gfx1201,persistent-cache` p95 queue 1h31m (> 1h00m)
@@ -35,30 +36,30 @@ _Updated: 2026-04-23T21:33Z_ — watching `iree-org/iree`, window = last 6h
 
 | label | jobs | queued | oldest queued | running | oldest running | avg | p50 | p95 | max | all-jobs fail | main-only fail | runners | SPOF |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|
-| `self-hosted,persistent-cache,Linux,X64,threadripper` | 45 | 27 | 4h23m | 1 | 3h12m | 20m07s | 0s | 2h53m | 3h31m | 6% (1/17) | 0% (0/2) | 2 |  |
-| `Linux,X64,iree-w7900` | 23 | 9 | 3h35m | 0 | — | 21m51s | 0s | 2h21m | 2h23m | 7% (1/14) | 0% (0/2) | 2 |  |
-| `Linux,X64,iree-r9700` | 23 | 5 | 3h35m | 0 | — | 40m02s | 12m36s | 2h17m | 2h37m | 6% (1/18) | 0% (0/5) | 1 | yes |
-| `Linux,X64,rdna3,persistent-cache,shark10-ci` | 23 | 6 | 2h42m | 0 | — | 39m12s | 2m14s | 2h03m | 2h09m | 0% (0/17) | 0% (0/4) | 1 | yes |
-| `Linux,X64,gfx1100` | 46 | 7 | 1h12m | 1 | 2h33m | 33m02s | 20m31s | 1h51m | 2h27m | 3% (1/38) | 0% (0/8) | 3 |  |
-| `Linux,X64,gfx1201` | 46 | 23 | 4h23m | 0 | — | 21m24s | 0s | 1h39m | 3h02m | 0% (0/23) | 0% (0/4) | 1 | yes |
-| `Linux,X64,rdna3,shark10-ci` | 23 | 13 | 4h23m | 0 | — | 13m58s | 0s | 1h32m | 2h18m | 0% (0/10) | 0% (0/1) | 1 | yes |
-| `Linux,X64,gfx1201,persistent-cache` | 23 | 7 | 3h12m | 1 | 2h33m | 28m06s | 14m14s | 1h31m | 1h55m | 0% (0/15) | 0% (0/3) | 1 | yes |
-| `Linux,X64,iree-w7900x2,persistent-cache` | 23 | 7 | 3h51m | 0 | — | 23m07s | 3m24s | 1h27m | 1h56m | 56% (9/16) | 60% (3/5) | 2 |  |
-| `Linux,X64,rdna3` | 23 | 3 | 44m55s | 0 | — | 31m25s | 10m17s | 1h26m | 2h21m | 5% (1/20) | 0% (0/5) | 3 |  |
-| `self-hosted,persistent-cache,Linux,X64` | 47 | 5 | 44m55s | 1 | 44m55s | 19m51s | 13m37s | 1h17m | 1h26m | 0% (0/41) | 0% (0/10) | 4 |  |
-| `Linux,X64,gfx1100,persistent-cache` | 23 | 2 | 44m55s | 0 | — | 26m24s | 20m33s | 1h04m | 1h46m | 0% (0/21) | 0% (0/5) | 3 |  |
-| `nodai-amdgpu-mi308-x86-64` | 23 | 1 | 36m26s | 1 | 44m55s | 9m24s | 5m21s | 23m31s | 38m06s | 0% (0/21) | 0% (0/5) | 1 | yes |
-| `linux-mi325-1gpu-ossci-iree-org` | 92 | 3 | 36m26s | 2 | 44m55s | 2m04s | 10s | 9m10s | 15m57s | 18% (16/87) | 15% (3/20) | 89 |  |
-| `macos-14` | 84 | 1 | 42m35s | 3 | 2h47m | 1m54s | 47s | 7m23s | 10m41s | 0% (0/80) | 0% (0/12) | 81 |  |
-| `ubuntu-24.04` | 433 | 9 | 36m26s | 6 | 2h47m | 54s | 3s | 4m47s | 16m10s | 6% (27/418) | 1% (1/73) | 416 |  |
-| `windows-2022` | 81 | 0 | — | 3 | 42m35s | 1m07s | 24s | 4m06s | 5m38s | 0% (0/78) | 0% (0/12) | 81 |  |
-| `ubuntu-24.04-arm` | 81 | 0 | — | 0 | — | 1m01s | 9s | 3m58s | 4m24s | 0% (0/81) | 0% (0/12) | 81 |  |
-| `ah-ubuntu_22_04-c7g_4x-50` | 3 | 0 | — | 0 | — | 2m00s | 1m55s | 2m10s | 2m10s | 0% (0/3) | — | 3 |  |
-| `macos-15-intel` | 4 | 0 | — | 3 | 2h47m | 32s | 14s | 1m47s | 1m47s | 0% (0/1) | — | 4 |  |
-| `azure-linux-scale` | 147 | 0 | — | 5 | 59m58s | 16s | 10s | 52s | 2m48s | 4% (6/142) | 0% (0/25) | 147 |  |
-| `azure-windows-scale` | 27 | 0 | — | 1 | 42m35s | 5s | 1s | 27s | 1m08s | 4% (1/26) | 0% (0/4) | 27 |  |
-| `ubuntu-latest` | 31 | 0 | — | 0 | — | 15s | 3s | 5s | 3m33s | 6% (2/31) | 0% (0/8) | 31 |  |
-| `linux-mi35x-1gpu-ossci-iree-org` | 23 | 0 | — | 1 | 36m26s | 1s | 2s | 2s | 7s | 23% (5/22) | 20% (1/5) | 23 |  |
+| `self-hosted,persistent-cache,Linux,X64,threadripper` | 43 | 31 | 5h20m | 1 | 4h09m | 19m35s | 0s | 2h53m | 3h31m | 9% (1/11) | — | 2 |  |
+| `Linux,X64,iree-w7900` | 22 | 11 | 4h33m | 0 | — | 21m26s | 0s | 2h21m | 2h23m | 9% (1/11) | 0% (0/1) | 2 |  |
+| `Linux,X64,iree-r9700` | 22 | 7 | 4h33m | 0 | — | 39m21s | 12m36s | 2h17m | 2h37m | 7% (1/15) | 0% (0/4) | 1 | yes |
+| `Linux,X64,rdna3,persistent-cache,shark10-ci` | 22 | 8 | 3h39m | 0 | — | 39m06s | 0s | 2h03m | 2h09m | 0% (0/14) | 0% (0/3) | 1 | yes |
+| `Linux,X64,gfx1100` | 44 | 9 | 2h09m | 2 | 3h30m | 33m32s | 22m33s | 1h51m | 2h27m | 3% (1/33) | 0% (0/7) | 3 |  |
+| `Linux,X64,gfx1201` | 44 | 27 | 5h20m | 0 | — | 20m58s | 0s | 1h39m | 3h02m | 0% (0/17) | 0% (0/2) | 1 | yes |
+| `Linux,X64,rdna3,shark10-ci` | 22 | 15 | 5h20m | 0 | — | 13m43s | 0s | 1h32m | 2h18m | 0% (0/7) | — | 1 | yes |
+| `Linux,X64,gfx1201,persistent-cache` | 22 | 9 | 4h09m | 1 | 3h30m | 26m40s | 0s | 1h31m | 1h55m | 0% (0/12) | 0% (0/2) | 1 | yes |
+| `Linux,X64,iree-w7900x2,persistent-cache` | 22 | 8 | 4h48m | 0 | — | 23m12s | 5m00s | 1h27m | 1h56m | 57% (8/14) | 60% (3/5) | 2 |  |
+| `Linux,X64,rdna3` | 22 | 3 | 1h42m | 0 | — | 32m29s | 15m20s | 1h26m | 2h21m | 5% (1/19) | 0% (0/6) | 3 |  |
+| `self-hosted,persistent-cache,Linux,X64` | 45 | 6 | 1h42m | 3 | 1h42m | 20m57s | 16m28s | 1h17m | 1h26m | 0% (0/36) | 0% (0/9) | 4 |  |
+| `Linux,X64,gfx1100,persistent-cache` | 22 | 2 | 1h42m | 0 | — | 26m56s | 20m33s | 1h04m | 1h46m | 0% (0/20) | 0% (0/6) | 3 |  |
+| `nodai-amdgpu-mi308-x86-64` | 22 | 1 | 1h33m | 1 | 1h42m | 9m24s | 5m21s | 23m31s | 38m06s | 0% (0/20) | 0% (0/6) | 1 | yes |
+| `linux-mi325-1gpu-ossci-iree-org` | 88 | 3 | 1h33m | 2 | 1h42m | 2m03s | 9s | 9m10s | 15m57s | 17% (14/83) | 12% (3/24) | 85 |  |
+| `macos-14` | 91 | 3 | 1h39m | 5 | 3h45m | 2m17s | 1m08s | 9m09s | 12m21s | 0% (0/83) | 0% (0/23) | 86 |  |
+| `windows-2022` | 87 | 0 | — | 7 | 1h39m | 1m09s | 30s | 4m35s | 5m38s | 1% (1/80) | 4% (1/23) | 87 |  |
+| `ubuntu-24.04` | 436 | 9 | 1h33m | 9 | 3h45m | 54s | 3s | 4m34s | 16m10s | 6% (23/418) | 1% (1/104) | 419 |  |
+| `macos-15-intel` | 5 | 0 | — | 4 | 3h45m | 1m19s | 14s | 4m30s | 4m30s | 0% (0/1) | — | 5 |  |
+| `ubuntu-24.04-arm` | 87 | 0 | — | 2 | 8m20s | 1m01s | 9s | 3m59s | 5m22s | 0% (0/85) | 0% (0/24) | 87 |  |
+| `ah-ubuntu_22_04-c7g_4x-50` | 4 | 0 | — | 1 | 8m20s | 1m59s | 1m59s | 2m10s | 2m10s | 0% (0/3) | — | 4 |  |
+| `azure-windows-scale` | 29 | 0 | — | 4 | 1h39m | 21s | 2s | 2m05s | 3m58s | 4% (1/25) | 0% (0/6) | 29 |  |
+| `ubuntu-latest` | 39 | 0 | — | 0 | — | 16s | 3s | 56s | 3m33s | 5% (2/39) | 0% (0/16) | 39 |  |
+| `azure-linux-scale` | 164 | 0 | — | 19 | 1h57m | 14s | 9s | 52s | 2m48s | 3% (4/145) | 0% (0/41) | 164 |  |
+| `linux-mi35x-1gpu-ossci-iree-org` | 22 | 0 | — | 1 | 1h33m | 1s | 2s | 2s | 7s | 19% (4/21) | 33% (2/6) | 22 |  |
 
 ## Methodology
 
