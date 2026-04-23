@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Iterable
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
@@ -22,6 +23,16 @@ STATUS_PATH = ROOT / "status.md"
 
 WINDOW_HOURS = 6
 SPOF_LOOKBACK_DAYS = 7
+RUNNER_LOOKBACK_DAYS = 7
+# Labels with more distinct runners than this over the lookback window are treated
+# as auto-scaler pools (ubuntu-*, azure-*, macos-*). Per-runner rows are suppressed
+# for those to keep the table readable; they're already summarized by label.
+PERSISTENT_LABEL_MAX = 15
+# Runners that saw fewer jobs than this over the lookback window are treated as
+# ephemeral autoscaler workers (their names are per-spawn, so they don't recur).
+PERSISTENT_RUNNER_MIN_JOBS = 5
+
+DISPLAY_TZ = ZoneInfo("America/Los_Angeles")
 
 # Alert thresholds
 P95_QUEUE_ALERT_S = 3600
@@ -79,6 +90,28 @@ class LabelStats:
         return self.all_fail / completed
 
 
+@dataclass
+class RunnerStats:
+    name: str
+    labels: set = field(default_factory=set)
+    total: int = 0
+    ok: int = 0
+    fail: int = 0
+    cancelled: int = 0
+    running: int = 0
+    last_seen_at: datetime | None = None
+
+    @property
+    def completed(self) -> int:
+        return self.ok + self.fail + self.cancelled
+
+    @property
+    def fail_rate(self) -> float | None:
+        if self.completed == 0:
+            return None
+        return self.fail / self.completed
+
+
 def _pct(xs: list[float], p: int) -> float:
     if not xs:
         return 0.0
@@ -93,13 +126,28 @@ def fmt_duration(s: float) -> str:
         return f"{s}s"
     if s < 3600:
         return f"{s // 60}m{s % 60:02d}s"
-    return f"{s // 3600}h{(s % 3600) // 60:02d}m"
+    if s < 86400:
+        return f"{s // 3600}h{(s % 3600) // 60:02d}m"
+    return f"{s // 86400}d{(s % 86400) // 3600:02d}h"
 
 
 def parse_iso(ts: str | None) -> datetime | None:
     if not ts:
         return None
     return datetime.fromisoformat(ts.replace("Z", "+00:00"))
+
+
+def fmt_when(now: datetime, ts: datetime | None) -> str:
+    if ts is None:
+        return "never"
+    delta = (now - ts).total_seconds()
+    if delta < 0:
+        delta = 0
+    return f"{fmt_duration(delta)} ago"
+
+
+def fmt_updated(now: datetime) -> str:
+    return now.astimezone(DISPLAY_TZ).strftime("%Y-%m-%d %H:%M %Z")
 
 
 def iter_jsonl(path: Path) -> Iterable[dict]:
@@ -128,6 +176,17 @@ def files_in_window(now: datetime, window_hours: int) -> list[Path]:
         DATA_DIR / f"{y:04d}" / f"{m:02d}" / f"{d:02d}.jsonl"
         for (y, m, d) in sorted(days)
     ]
+
+
+def files_in_days(now: datetime, lookback_days: int) -> list[Path]:
+    start = now - timedelta(days=lookback_days)
+    paths: list[Path] = []
+    cur = start.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    while cur <= end:
+        paths.append(DATA_DIR / f"{cur.year:04d}" / f"{cur.month:02d}" / f"{cur.day:02d}.jsonl")
+        cur += timedelta(days=1)
+    return paths
 
 
 def is_main_post_merge(rec: dict) -> bool:
@@ -190,22 +249,70 @@ def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
     return by_label
 
 
-def spof_labels(now: datetime, lookback_days: int) -> set[str]:
-    """Labels that have only seen a single distinct runner_name in the last N days."""
-    start = now - timedelta(days=lookback_days)
-    runners_per_label: dict[str, set[str]] = collections.defaultdict(set)
-    cur = start.replace(hour=0, minute=0, second=0, microsecond=0)
-    end = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    while cur <= end:
-        path = DATA_DIR / f"{cur.year:04d}" / f"{cur.month:02d}" / f"{cur.day:02d}.jsonl"
+def aggregate_runners(
+    now: datetime, lookback_days: int
+) -> tuple[dict[str, RunnerStats], dict[str, set[str]]]:
+    """Aggregate per-runner stats over `lookback_days`. Also returns the
+    distinct-runner set per label over the same window (used for SPOF detection
+    and for filtering out auto-scaler pools from the per-runner view)."""
+    runners: dict[str, RunnerStats] = {}
+    label_runners: dict[str, set[str]] = collections.defaultdict(set)
+
+    for path in files_in_days(now, lookback_days):
         for rec in iter_jsonl(path):
-            labels = rec.get("labels") or []
             rn = rec.get("runner_name")
-            if not labels or not rn:
+            labels = rec.get("labels") or []
+            key = ",".join(labels) if labels else ""
+            if rn and labels:
+                label_runners[key].add(rn)
+            if not rn:
                 continue
-            runners_per_label[",".join(labels)].add(rn)
-        cur += timedelta(days=1)
-    return {lab for lab, rs in runners_per_label.items() if len(rs) == 1}
+            r = runners.setdefault(rn, RunnerStats(name=rn))
+            if labels:
+                r.labels.add(key)
+            r.total += 1
+            status = rec.get("status")
+            concl = rec.get("conclusion")
+            if status == "completed":
+                if concl == "success":
+                    r.ok += 1
+                elif concl == "failure":
+                    r.fail += 1
+                elif concl == "cancelled":
+                    r.cancelled += 1
+                comp = parse_iso(rec.get("completed_at"))
+                if comp and (r.last_seen_at is None or comp > r.last_seen_at):
+                    r.last_seen_at = comp
+            elif status == "in_progress":
+                r.running += 1
+                started = parse_iso(rec.get("started_at"))
+                if started and (r.last_seen_at is None or started > r.last_seen_at):
+                    r.last_seen_at = started
+    return runners, dict(label_runners)
+
+
+def is_persistent_runner(r: RunnerStats, label_runners: dict[str, set[str]]) -> bool:
+    if r.total < PERSISTENT_RUNNER_MIN_JOBS:
+        return False
+    for L in r.labels:
+        count = len(label_runners.get(L, set()))
+        if 0 < count <= PERSISTENT_LABEL_MAX:
+            return True
+    return False
+
+
+def fmt_labels_short(labels: set[str], limit: int = 2) -> str:
+    if not labels:
+        return "—"
+    items = sorted(labels)
+    if len(items) <= limit:
+        return ", ".join(f"`{L}`" for L in items)
+    head = ", ".join(f"`{L}`" for L in items[:limit])
+    return f"{head}, +{len(items) - limit} more"
+
+
+def spof_labels_from(label_runners: dict[str, set[str]]) -> set[str]:
+    return {lab for lab, rs in label_runners.items() if len(rs) == 1}
 
 
 def build_alerts(stats: dict[str, LabelStats], spof: set[str]) -> list[tuple[str, str]]:
@@ -226,32 +333,33 @@ def build_alerts(stats: dict[str, LabelStats], spof: set[str]) -> list[tuple[str
     return alerts
 
 
-def render_readme(now: datetime, stats: dict[str, LabelStats], alerts: list[tuple[str, str]]) -> str:
-    lines = []
+def _runner_sort_key(r: RunnerStats):
+    # Running now first, then most-recently-seen.
+    last = r.last_seen_at or datetime.min.replace(tzinfo=timezone.utc)
+    return (0 if r.running > 0 else 1, -last.timestamp())
+
+
+def render_readme(
+    now: datetime,
+    stats: dict[str, LabelStats],
+    alerts: list[tuple[str, str]],
+    runners: dict[str, RunnerStats],
+    label_runners: dict[str, set[str]],
+) -> str:
+    lines: list[str] = []
     lines.append("# iree-ci-monitor")
     lines.append("")
-    lines.append(f"_Updated: {now.strftime('%Y-%m-%dT%H:%MZ')}_ — `iree-org/iree`, last {WINDOW_HOURS}h")
+    lines.append(f"_Updated: {fmt_updated(now)}_ — `iree-org/iree`, last {WINDOW_HOURS}h")
     lines.append("")
     lines.append("Automated tracker of GitHub Actions runner health for the IREE project. ")
     lines.append("Each tick, the collector pulls new run+job metadata via the GitHub REST API and the reporter regenerates this page.")
-    lines.append("")
-
-    lines.append("## Alerts")
-    if not alerts:
-        lines.append("")
-        lines.append("_No active alerts._")
-    else:
-        lines.append("")
-        for tag, msg in alerts:
-            lines.append(f"- **[{tag}]** {msg}")
     lines.append("")
 
     lines.append(f"## Top of queue (sorted by p95, last {WINDOW_HOURS}h)")
     lines.append("")
     lines.append("| label | jobs | queued | oldest queued | running | p50 queue | p95 queue | main fail rate | runners |")
     lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|")
-    rows = sorted(stats.values(), key=lambda s: -s.p95)
-    for s in rows:
+    for s in sorted(stats.values(), key=lambda s: -s.p95):
         fr = s.main_fail_rate
         fr_s = f"{fr:.0%} ({s.main_fail}/{s.main_ok + s.main_fail + s.main_cancelled})" if fr is not None else "—"
         lines.append(
@@ -262,16 +370,27 @@ def render_readme(now: datetime, stats: dict[str, LabelStats], alerts: list[tupl
             f"{fr_s} | {len(s.runners)} |"
         )
     lines.append("")
-    lines.append("See [`status.md`](status.md) for the full per-label breakdown including all-jobs failure rates, methodology, and thresholds.")
-    lines.append("")
-    return "\n".join(lines)
 
-
-def render_status(now: datetime, stats: dict[str, LabelStats], alerts: list[tuple[str, str]], spof: set[str]) -> str:
-    lines = []
-    lines.append("# Status detail")
+    persistent = sorted(
+        (r for r in runners.values() if is_persistent_runner(r, label_runners)),
+        key=_runner_sort_key,
+    )
+    lines.append(f"## Self-hosted runners (last {RUNNER_LOOKBACK_DAYS}d)")
     lines.append("")
-    lines.append(f"_Updated: {now.strftime('%Y-%m-%dT%H:%MZ')}_ — watching `iree-org/iree`, window = last {WINDOW_HOURS}h")
+    if not persistent:
+        lines.append("_No persistent runners observed yet._")
+    else:
+        lines.append("| runner | labels | jobs | fail rate | running | last seen |")
+        lines.append("|---|---|---:|---:|:---:|---:|")
+        for r in persistent:
+            fr = r.fail_rate
+            fr_s = f"{fr:.0%} ({r.fail}/{r.completed})" if fr is not None else "—"
+            running = "yes" if r.running > 0 else ""
+            last_s = "running" if r.running > 0 else fmt_when(now, r.last_seen_at)
+            lines.append(
+                f"| `{r.name}` | {fmt_labels_short(r.labels)} | {r.total} | "
+                f"{fr_s} | {running} | {last_s} |"
+            )
     lines.append("")
 
     lines.append("## Alerts")
@@ -284,12 +403,30 @@ def render_status(now: datetime, stats: dict[str, LabelStats], alerts: list[tupl
             lines.append(f"- **[{tag}]** {msg}")
     lines.append("")
 
+    lines.append("See [`status.md`](status.md) for the full per-label breakdown including all-jobs failure rates, methodology, and thresholds.")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def render_status(
+    now: datetime,
+    stats: dict[str, LabelStats],
+    alerts: list[tuple[str, str]],
+    spof: set[str],
+    runners: dict[str, RunnerStats],
+    label_runners: dict[str, set[str]],
+) -> str:
+    lines: list[str] = []
+    lines.append("# Status detail")
+    lines.append("")
+    lines.append(f"_Updated: {fmt_updated(now)}_ — watching `iree-org/iree`, window = last {WINDOW_HOURS}h")
+    lines.append("")
+
     lines.append("## Per-label metrics")
     lines.append("")
     lines.append("| label | jobs | queued | oldest queued | running | oldest running | avg | p50 | p95 | max | all-jobs fail | main-only fail | runners | SPOF |")
     lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|")
-    rows = sorted(stats.values(), key=lambda s: -s.p95)
-    for s in rows:
+    for s in sorted(stats.values(), key=lambda s: -s.p95):
         fr_all = s.all_fail_rate
         fr_main = s.main_fail_rate
         fr_all_s = (
@@ -312,9 +449,48 @@ def render_status(now: datetime, stats: dict[str, LabelStats], alerts: list[tupl
         )
     lines.append("")
 
+    persistent = sorted(
+        (r for r in runners.values() if is_persistent_runner(r, label_runners)),
+        key=_runner_sort_key,
+    )
+    lines.append(f"## Per-runner metrics (self-hosted, last {RUNNER_LOOKBACK_DAYS}d)")
+    lines.append("")
+    lines.append(
+        f"Only runners that served at least one label with ≤ {PERSISTENT_LABEL_MAX} distinct runners in the lookback window are listed. "
+        "Ephemeral auto-scaler workers (ubuntu-*, azure-*, macos-*, mi325, etc.) are summarized by label above."
+    )
+    lines.append("")
+    if not persistent:
+        lines.append("_No persistent runners observed yet._")
+    else:
+        lines.append("| runner | labels | jobs | ok | fail | cancelled | fail rate | running | last seen |")
+        lines.append("|---|---|---:|---:|---:|---:|---:|:---:|---:|")
+        for r in persistent:
+            labels_s = ", ".join(f"`{L}`" for L in sorted(r.labels)) if r.labels else "—"
+            fr = r.fail_rate
+            fr_s = f"{fr:.0%}" if fr is not None else "—"
+            running = "yes" if r.running > 0 else ""
+            last_s = "running" if r.running > 0 else fmt_when(now, r.last_seen_at)
+            lines.append(
+                f"| `{r.name}` | {labels_s} | {r.total} | {r.ok} | {r.fail} | {r.cancelled} | "
+                f"{fr_s} | {running} | {last_s} |"
+            )
+    lines.append("")
+
+    lines.append("## Alerts")
+    if not alerts:
+        lines.append("")
+        lines.append("_No active alerts._")
+    else:
+        lines.append("")
+        for tag, msg in alerts:
+            lines.append(f"- **[{tag}]** {msg}")
+    lines.append("")
+
     lines.append("## Methodology")
     lines.append("")
-    lines.append(f"- Window: last {WINDOW_HOURS} hours of job records (created_at ≥ now-{WINDOW_HOURS}h).")
+    lines.append(f"- Window: last {WINDOW_HOURS} hours of job records for label metrics; last {RUNNER_LOOKBACK_DAYS} days for runner metrics and SPOF.")
+    lines.append(f"- Timestamps rendered in `{DISPLAY_TZ.key}` local time; underlying records are UTC.")
     lines.append("- Queue time: `started_at - created_at`. Skipped jobs excluded.")
     lines.append("- Queued: jobs with `status == queued` or `waiting` (not yet assigned a runner).")
     lines.append("- Running: jobs with `status == in_progress` (runner assigned, executing).")
@@ -322,6 +498,7 @@ def render_status(now: datetime, stats: dict[str, LabelStats], alerts: list[tupl
     lines.append("- All-jobs fail rate: over every completed job (PR + push + schedule).")
     lines.append("- Main-only fail rate: subset where `head_branch == main` and `event != pull_request` — post-merge, scheduled, and workflow_dispatch runs. PR noise excluded.")
     lines.append(f"- SPOF: label has seen only one distinct `runner_name` in the last {SPOF_LOOKBACK_DAYS} days.")
+    lines.append(f"- Persistent runner: ran ≥ {PERSISTENT_RUNNER_MIN_JOBS} jobs in the lookback window AND served at least one label with ≤ {PERSISTENT_LABEL_MAX} distinct runners. Ephemeral auto-scaler worker names (which appear once per spawn) are excluded.")
     lines.append("- Re-runs: `(job_id, run_attempt)` tuples are distinct; a re-run counts as a new job.")
     lines.append("")
 
@@ -338,12 +515,17 @@ def render_status(now: datetime, stats: dict[str, LabelStats], alerts: list[tupl
 def main() -> None:
     now = datetime.now(timezone.utc)
     stats = aggregate(now, WINDOW_HOURS)
-    spof = spof_labels(now, SPOF_LOOKBACK_DAYS)
+    runners, label_runners = aggregate_runners(now, RUNNER_LOOKBACK_DAYS)
+    spof = spof_labels_from(label_runners)
     alerts = build_alerts(stats, spof)
 
-    README_PATH.write_text(render_readme(now, stats, alerts))
-    STATUS_PATH.write_text(render_status(now, stats, alerts, spof))
-    print(f"[report] labels={len(stats)} alerts={len(alerts)} spof={len(spof)}", flush=True)
+    README_PATH.write_text(render_readme(now, stats, alerts, runners, label_runners))
+    STATUS_PATH.write_text(render_status(now, stats, alerts, spof, runners, label_runners))
+    print(
+        f"[report] labels={len(stats)} alerts={len(alerts)} "
+        f"spof={len(spof)} runners={len(runners)}",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":
