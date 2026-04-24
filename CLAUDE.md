@@ -22,9 +22,17 @@ mislead triage. Favor fewer, correct signals over many noisy ones.
 1. **Python stdlib only.** No `requirements.txt`, no pip install step. Everything
    runs on `ubuntu-latest` with a bare `actions/setup-python@v5`.
 2. **Append-only JSONL.** Never rewrite `data/YYYY/MM/DD.jsonl` files; only
-   append. Dedupe on `(job_id, run_attempt)` by loading existing keys before
-   writing. The collector must be idempotent — running twice in a row appends
-   zero lines.
+   append. Collector dedupes on `(job_id, run_attempt, status)` by loading
+   existing keys before writing. The status component is load-bearing: a job
+   progresses `queued -> in_progress -> completed` and each transition gets
+   its own line, so the reader can see the latest state. With the old
+   `(job_id, run_attempt)` key the first snapshot (usually `queued`) locked
+   the record and stale records claimed jobs were queued for days. The
+   collector must still be idempotent — running twice in a row with no state
+   change appends zero lines (same tuple, already in set). The reader
+   (`iter_latest_per_job` in `report.py`) dedupes to the most recent snapshot
+   per `(job_id, run_attempt)` at read time; aggregators always consume that
+   iterator, not `iter_jsonl` directly.
 3. **Preserve the two-tier checkpoint.** `data/.state.json` tracks both
    `last_completed_run_id` (high-water mark) *and* `open_run_ids` (set of
    still-in-flight runs to re-fetch each tick). Do NOT collapse to a single

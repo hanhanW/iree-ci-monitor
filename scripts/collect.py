@@ -176,8 +176,16 @@ def jsonl_path_for(dt: datetime) -> Path:
     return DATA_DIR / f"{dt.year:04d}" / f"{dt.month:02d}" / f"{dt.day:02d}.jsonl"
 
 
-def existing_keys_for_day(path: Path) -> set[tuple[int, int]]:
-    keys: set[tuple[int, int]] = set()
+def existing_keys_for_day(path: Path) -> set[tuple[int, int, str]]:
+    """Return (job_id, run_attempt, status) tuples already recorded for this day.
+
+    Status is part of the key so state transitions (queued -> in_progress ->
+    completed) each produce a new JSONL line, while re-running collect with no
+    state change appends zero lines. Without status in the key, the first
+    snapshot (often queued) would lock the record forever — making the reader
+    believe a long-completed job is still queued.
+    """
+    keys: set[tuple[int, int, str]] = set()
     if not path.exists():
         return keys
     with path.open() as f:
@@ -189,7 +197,11 @@ def existing_keys_for_day(path: Path) -> set[tuple[int, int]]:
                 obj = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            k = (int(obj["job_id"]), int(obj.get("run_attempt", 1)))
+            k = (
+                int(obj["job_id"]),
+                int(obj.get("run_attempt", 1)),
+                str(obj.get("status", "")),
+            )
             keys.add(k)
     return keys
 
@@ -303,7 +315,10 @@ def collect() -> None:
     total_new = 0
     for path, recs in by_day.items():
         existing = existing_keys_for_day(path)
-        fresh = [r for r in recs if (r["job_id"], r["run_attempt"]) not in existing]
+        fresh = [
+            r for r in recs
+            if (r["job_id"], r["run_attempt"], r.get("status", "")) not in existing
+        ]
         append_jsonl(path, fresh)
         total_new += len(fresh)
         log(f"{path.relative_to(ROOT)}: +{len(fresh)} (had {len(existing)})")

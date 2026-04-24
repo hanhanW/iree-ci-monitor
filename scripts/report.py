@@ -186,6 +186,24 @@ def iter_jsonl(path: Path) -> Iterable[dict]:
                 continue
 
 
+def iter_latest_per_job(paths: Iterable[Path]) -> Iterable[dict]:
+    """Yield the most recent snapshot per (job_id, run_attempt) across the given
+    files. The collector appends a new line on each state transition; iterating
+    naively would count a queued->in_progress->completed job three times and
+    leave stale queued records polluting live-state metrics. Append order in
+    each JSONL is chronological, and we read files in calendar order, so the
+    last assignment into `latest` wins."""
+    latest: dict[tuple[int, int], dict] = {}
+    for path in paths:
+        for rec in iter_jsonl(path):
+            try:
+                key = (int(rec["job_id"]), int(rec.get("run_attempt", 1)))
+            except (KeyError, ValueError, TypeError):
+                continue
+            latest[key] = rec
+    yield from latest.values()
+
+
 def files_in_window(now: datetime, window_hours: int) -> list[Path]:
     start = now - timedelta(hours=window_hours)
     days: set[tuple[int, int, int]] = set()
@@ -242,53 +260,56 @@ def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
     cutoff = now - timedelta(hours=window_hours)
     by_label: dict[str, LabelStats] = {}
 
-    for path in files_in_window(now, window_hours):
-        for rec in iter_jsonl(path):
-            created = parse_iso(rec.get("created_at"))
-            if created is None or created < cutoff:
-                continue
-            labels = rec.get("labels") or []
-            if not labels:
-                continue
-            key = ",".join(labels)
-            s = by_label.setdefault(key, LabelStats(label=key))
-            s.total += 1
+    for rec in iter_latest_per_job(files_in_window(now, window_hours)):
+        created = parse_iso(rec.get("created_at"))
+        if created is None or created < cutoff:
+            continue
+        labels = rec.get("labels") or []
+        if not labels:
+            continue
+        key = ",".join(labels)
+        s = by_label.setdefault(key, LabelStats(label=key))
+        s.total += 1
 
-            status = rec.get("status")
-            concl = rec.get("conclusion")
-            main = is_main_post_merge(rec)
-            if status == "completed":
-                if concl == "success":
-                    s.all_ok += 1
-                    if main:
-                        s.main_ok += 1
-                elif concl == "failure":
-                    s.all_fail += 1
-                    if main:
-                        s.main_fail += 1
-                elif concl == "cancelled":
-                    s.all_cancelled += 1
-                    if main:
-                        s.main_cancelled += 1
-            elif status == "queued" or status == "waiting":
-                s.queued += 1
-                wait = max(0.0, (now - created).total_seconds())
-                if s.oldest_queued_ref is None or wait > s.oldest_queued_s:
-                    s.oldest_queued_s = wait
-                    s.oldest_queued_ref = (int(rec["run_id"]), int(rec["job_id"]))
-            elif status == "in_progress":
-                s.in_progress += 1
-                wait = max(0.0, (now - created).total_seconds())
-                if s.oldest_in_progress_ref is None or wait > s.oldest_in_progress_s:
-                    s.oldest_in_progress_s = wait
-                    s.oldest_in_progress_ref = (int(rec["run_id"]), int(rec["job_id"]))
+        status = rec.get("status")
+        concl = rec.get("conclusion")
+        main = is_main_post_merge(rec)
+        if status == "completed":
+            if concl == "success":
+                s.all_ok += 1
+                if main:
+                    s.main_ok += 1
+            elif concl == "failure":
+                s.all_fail += 1
+                if main:
+                    s.main_fail += 1
+            elif concl == "cancelled":
+                s.all_cancelled += 1
+                if main:
+                    s.main_cancelled += 1
+        elif status == "queued" or status == "waiting":
+            s.queued += 1
+            wait = max(0.0, (now - created).total_seconds())
+            if s.oldest_queued_ref is None or wait > s.oldest_queued_s:
+                s.oldest_queued_s = wait
+                s.oldest_queued_ref = (int(rec["run_id"]), int(rec["job_id"]))
+        elif status == "in_progress":
+            s.in_progress += 1
+            wait = max(0.0, (now - created).total_seconds())
+            if s.oldest_in_progress_ref is None or wait > s.oldest_in_progress_s:
+                s.oldest_in_progress_s = wait
+                s.oldest_in_progress_ref = (int(rec["run_id"]), int(rec["job_id"]))
 
-            rn = rec.get("runner_name")
-            if rn:
-                s.runners.add(rn)
+        rn = rec.get("runner_name")
+        if rn:
+            s.runners.add(rn)
 
+        # Queue time is only meaningful once the job has actually started.
+        # For `queued` records GitHub returns started_at == created_at which
+        # would contribute spurious 0s to the percentile pool.
+        if status in ("completed", "in_progress") and concl != "skipped":
             started = parse_iso(rec.get("started_at"))
-            if started and created and concl != "skipped":
+            if started and created:
                 q = (started - created).total_seconds()
                 if q >= 0:
                     s.qtimes.append((q, int(rec["run_id"]), int(rec["job_id"])))
@@ -301,41 +322,41 @@ def aggregate_period(start: datetime, end: datetime) -> dict[str, LabelStats]:
     report: queued/running ages aren't tracked because they're a current-state
     signal that doesn't apply to a historical window."""
     by_label: dict[str, LabelStats] = {}
-    for path in files_in_range(start, end):
-        for rec in iter_jsonl(path):
-            created = parse_iso(rec.get("created_at"))
-            if created is None or created < start or created >= end:
-                continue
-            labels = rec.get("labels") or []
-            if not labels:
-                continue
-            key = ",".join(labels)
-            s = by_label.setdefault(key, LabelStats(label=key))
-            s.total += 1
+    for rec in iter_latest_per_job(files_in_range(start, end)):
+        created = parse_iso(rec.get("created_at"))
+        if created is None or created < start or created >= end:
+            continue
+        labels = rec.get("labels") or []
+        if not labels:
+            continue
+        key = ",".join(labels)
+        s = by_label.setdefault(key, LabelStats(label=key))
+        s.total += 1
 
-            status = rec.get("status")
-            concl = rec.get("conclusion")
-            main = is_main_post_merge(rec)
-            if status == "completed":
-                if concl == "success":
-                    s.all_ok += 1
-                    if main:
-                        s.main_ok += 1
-                elif concl == "failure":
-                    s.all_fail += 1
-                    if main:
-                        s.main_fail += 1
-                elif concl == "cancelled":
-                    s.all_cancelled += 1
-                    if main:
-                        s.main_cancelled += 1
+        status = rec.get("status")
+        concl = rec.get("conclusion")
+        main = is_main_post_merge(rec)
+        if status == "completed":
+            if concl == "success":
+                s.all_ok += 1
+                if main:
+                    s.main_ok += 1
+            elif concl == "failure":
+                s.all_fail += 1
+                if main:
+                    s.main_fail += 1
+            elif concl == "cancelled":
+                s.all_cancelled += 1
+                if main:
+                    s.main_cancelled += 1
 
-            rn = rec.get("runner_name")
-            if rn:
-                s.runners.add(rn)
+        rn = rec.get("runner_name")
+        if rn:
+            s.runners.add(rn)
 
+        if status in ("completed", "in_progress") and concl != "skipped":
             started = parse_iso(rec.get("started_at"))
-            if started and concl != "skipped":
+            if started:
                 q = (started - created).total_seconds()
                 if q >= 0:
                     s.qtimes.append((q, int(rec["run_id"]), int(rec["job_id"])))
@@ -351,36 +372,35 @@ def aggregate_runners(
     runners: dict[str, RunnerStats] = {}
     label_runners: dict[str, set[str]] = collections.defaultdict(set)
 
-    for path in files_in_days(now, lookback_days):
-        for rec in iter_jsonl(path):
-            rn = rec.get("runner_name")
-            labels = rec.get("labels") or []
-            key = ",".join(labels) if labels else ""
-            if rn and labels:
-                label_runners[key].add(rn)
-            if not rn:
-                continue
-            r = runners.setdefault(rn, RunnerStats(name=rn))
-            if labels:
-                r.labels.add(key)
-            r.total += 1
-            status = rec.get("status")
-            concl = rec.get("conclusion")
-            if status == "completed":
-                if concl == "success":
-                    r.ok += 1
-                elif concl == "failure":
-                    r.fail += 1
-                elif concl == "cancelled":
-                    r.cancelled += 1
-                comp = parse_iso(rec.get("completed_at"))
-                if comp and (r.last_seen_at is None or comp > r.last_seen_at):
-                    r.last_seen_at = comp
-            elif status == "in_progress":
-                r.running += 1
-                started = parse_iso(rec.get("started_at"))
-                if started and (r.last_seen_at is None or started > r.last_seen_at):
-                    r.last_seen_at = started
+    for rec in iter_latest_per_job(files_in_days(now, lookback_days)):
+        rn = rec.get("runner_name")
+        labels = rec.get("labels") or []
+        key = ",".join(labels) if labels else ""
+        if rn and labels:
+            label_runners[key].add(rn)
+        if not rn:
+            continue
+        r = runners.setdefault(rn, RunnerStats(name=rn))
+        if labels:
+            r.labels.add(key)
+        r.total += 1
+        status = rec.get("status")
+        concl = rec.get("conclusion")
+        if status == "completed":
+            if concl == "success":
+                r.ok += 1
+            elif concl == "failure":
+                r.fail += 1
+            elif concl == "cancelled":
+                r.cancelled += 1
+            comp = parse_iso(rec.get("completed_at"))
+            if comp and (r.last_seen_at is None or comp > r.last_seen_at):
+                r.last_seen_at = comp
+        elif status == "in_progress":
+            r.running += 1
+            started = parse_iso(rec.get("started_at"))
+            if started and (r.last_seen_at is None or started > r.last_seen_at):
+                r.last_seen_at = started
     return runners, dict(label_runners)
 
 
