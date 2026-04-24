@@ -55,7 +55,7 @@ class LabelStats:
     all_ok: int = 0
     all_fail: int = 0
     all_cancelled: int = 0
-    qtimes: list[float] = field(default_factory=list)
+    qtimes: list[tuple[float, int, int]] = field(default_factory=list)  # (qsec, run_id, job_id)
     oldest_queued_s: float = 0.0
     oldest_queued_ref: tuple[int, int] | None = None  # (run_id, job_id)
     oldest_in_progress_s: float = 0.0
@@ -66,17 +66,33 @@ class LabelStats:
     def pending(self) -> int:
         return self.queued + self.in_progress
 
+    def _pct_entry(self, p: int) -> tuple[float, tuple[int, int] | None]:
+        if not self.qtimes:
+            return 0.0, None
+        xs = sorted(self.qtimes)
+        k = max(0, min(len(xs) - 1, int(round((p / 100) * (len(xs) - 1)))))
+        q, run_id, job_id = xs[k]
+        return q, (run_id, job_id)
+
     @property
     def p50(self) -> float:
-        return _pct(self.qtimes, 50)
+        return self._pct_entry(50)[0]
+
+    @property
+    def p50_ref(self) -> tuple[int, int] | None:
+        return self._pct_entry(50)[1]
 
     @property
     def p95(self) -> float:
-        return _pct(self.qtimes, 95)
+        return self._pct_entry(95)[0]
+
+    @property
+    def p95_ref(self) -> tuple[int, int] | None:
+        return self._pct_entry(95)[1]
 
     @property
     def avg(self) -> float:
-        return statistics.mean(self.qtimes) if self.qtimes else 0.0
+        return statistics.mean(q for q, _r, _j in self.qtimes) if self.qtimes else 0.0
 
     @property
     def main_fail_rate(self) -> float | None:
@@ -113,14 +129,6 @@ class RunnerStats:
         if self.completed == 0:
             return None
         return self.fail / self.completed
-
-
-def _pct(xs: list[float], p: int) -> float:
-    if not xs:
-        return 0.0
-    xs = sorted(xs)
-    k = max(0, min(len(xs) - 1, int(round((p / 100) * (len(xs) - 1)))))
-    return xs[k]
 
 
 def fmt_oldest(seconds: float, ref: tuple[int, int] | None) -> str:
@@ -258,7 +266,7 @@ def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
             if started and created and concl != "skipped":
                 q = (started - created).total_seconds()
                 if q >= 0:
-                    s.qtimes.append(q)
+                    s.qtimes.append((q, int(rec["run_id"]), int(rec["job_id"])))
 
     return by_label
 
@@ -398,7 +406,7 @@ def render_readme(
             f"| `{s.label}` | {classify_label(s.label)} | {s.total} | {s.queued} | "
             f"{fmt_oldest(s.oldest_queued_s, s.oldest_queued_ref) if s.queued else '—'} | "
             f"{s.in_progress} | "
-            f"{fmt_duration(s.p50)} | {fmt_duration(s.p95)} | "
+            f"{fmt_oldest(s.p50, s.p50_ref)} | {fmt_oldest(s.p95, s.p95_ref)} | "
             f"{fr_s} | {len(s.runners)} |"
         )
     lines.append("")
@@ -469,14 +477,18 @@ def render_status(
             f"{fr_main:.0%} ({s.main_fail}/{s.main_ok + s.main_fail + s.main_cancelled})"
             if fr_main is not None else "—"
         )
-        max_q = max(s.qtimes) if s.qtimes else 0
+        if s.qtimes:
+            max_entry = max(s.qtimes)
+            max_q, max_ref = max_entry[0], (max_entry[1], max_entry[2])
+        else:
+            max_q, max_ref = 0.0, None
         lines.append(
             f"| `{s.label}` | {classify_label(s.label)} | {s.total} | {s.queued} | "
             f"{fmt_oldest(s.oldest_queued_s, s.oldest_queued_ref) if s.queued else '—'} | "
             f"{s.in_progress} | "
             f"{fmt_oldest(s.oldest_in_progress_s, s.oldest_in_progress_ref) if s.in_progress else '—'} | "
-            f"{fmt_duration(s.avg)} | {fmt_duration(s.p50)} | {fmt_duration(s.p95)} | "
-            f"{fmt_duration(max_q)} | {fr_all_s} | {fr_main_s} | "
+            f"{fmt_duration(s.avg)} | {fmt_oldest(s.p50, s.p50_ref)} | {fmt_oldest(s.p95, s.p95_ref)} | "
+            f"{fmt_oldest(max_q, max_ref)} | {fr_all_s} | {fr_main_s} | "
             f"{len(s.runners)} | {'yes' if s.label in spof else ''} |"
         )
     lines.append("")
