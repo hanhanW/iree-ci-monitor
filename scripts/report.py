@@ -353,6 +353,24 @@ def _runner_sort_key(r: RunnerStats):
     return (0 if r.running > 0 else 1, -last.timestamp())
 
 
+def classify_label(label: str) -> str:
+    """Classify a label as self-hosted, github-hosted, or ossci.
+
+    - github-hosted: GitHub's standard runner pool (ubuntu-*, macos-*, windows-*)
+      and Actions Hosting partner runners (ah-*). Ephemeral per-job workers.
+    - ossci: IREE org-managed autoscaler pools — labels containing `ossci` or
+      starting with `azure-`. Also ephemeral per-job workers.
+    - self-hosted: physical named hosts (shark fleet, iree-mi308-1, etc.).
+    """
+    low = label.lower()
+    for prefix in ("ubuntu-", "macos-", "windows-", "ah-"):
+        if low.startswith(prefix):
+            return "github-hosted"
+    if low.startswith("azure-") or "ossci" in low:
+        return "ossci"
+    return "self-hosted"
+
+
 def render_readme(
     now: datetime,
     stats: dict[str, LabelStats],
@@ -371,13 +389,13 @@ def render_readme(
 
     lines.append(f"## Top of queue (sorted by p95, last {WINDOW_HOURS}h)")
     lines.append("")
-    lines.append("| label | jobs | queued | oldest queued | running | p50 queue | p95 queue | main fail rate | runners |")
-    lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|")
+    lines.append("| label | type | jobs | queued | oldest queued | running | p50 queue | p95 queue | main fail rate | runners |")
+    lines.append("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|")
     for s in sorted(stats.values(), key=lambda s: -s.p95):
         fr = s.main_fail_rate
         fr_s = f"{fr:.0%} ({s.main_fail}/{s.main_ok + s.main_fail + s.main_cancelled})" if fr is not None else "—"
         lines.append(
-            f"| `{s.label}` | {s.total} | {s.queued} | "
+            f"| `{s.label}` | {classify_label(s.label)} | {s.total} | {s.queued} | "
             f"{fmt_oldest(s.oldest_queued_s, s.oldest_queued_ref) if s.queued else '—'} | "
             f"{s.in_progress} | "
             f"{fmt_duration(s.p50)} | {fmt_duration(s.p95)} | "
@@ -438,8 +456,8 @@ def render_status(
 
     lines.append("## Per-label metrics")
     lines.append("")
-    lines.append("| label | jobs | queued | oldest queued | running | oldest running | avg | p50 | p95 | max | all-jobs fail | main-only fail | runners | SPOF |")
-    lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|")
+    lines.append("| label | type | jobs | queued | oldest queued | running | oldest running | avg | p50 | p95 | max | all-jobs fail | main-only fail | runners | SPOF |")
+    lines.append("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|")
     for s in sorted(stats.values(), key=lambda s: -s.p95):
         fr_all = s.all_fail_rate
         fr_main = s.main_fail_rate
@@ -453,7 +471,7 @@ def render_status(
         )
         max_q = max(s.qtimes) if s.qtimes else 0
         lines.append(
-            f"| `{s.label}` | {s.total} | {s.queued} | "
+            f"| `{s.label}` | {classify_label(s.label)} | {s.total} | {s.queued} | "
             f"{fmt_oldest(s.oldest_queued_s, s.oldest_queued_ref) if s.queued else '—'} | "
             f"{s.in_progress} | "
             f"{fmt_oldest(s.oldest_in_progress_s, s.oldest_in_progress_ref) if s.in_progress else '—'} | "
@@ -511,6 +529,10 @@ def render_status(
     lines.append("- Oldest queued: `now - created_at` for the oldest still-queued job. This is the actionable signal for runner starvation — a job that's been in_progress for hours is just slow, not starved.")
     lines.append("- All-jobs fail rate: over every completed job (PR + push + schedule).")
     lines.append("- Main-only fail rate: subset where `head_branch == main` and `event != pull_request` — post-merge, scheduled, and workflow_dispatch runs. PR noise excluded.")
+    lines.append("- Runner type:")
+    lines.append("  - `self-hosted`: persistent physical hosts managed by the IREE infra team (shark fleet, `iree-mi308-1`, etc.). The `runners` count is the number of physical boxes.")
+    lines.append("  - `github-hosted`: GitHub's standard runner pool (`ubuntu-*`, `macos-*`, `windows-*`) and Actions Hosting partners (`ah-*`). Ephemeral — one worker per job.")
+    lines.append("  - `ossci`: org-managed autoscaler pools (`azure-*`, `*-ossci-iree-org`). Ephemeral — one worker per job, so the `runners` count here is really \"pod spawns in the window\" not physical capacity.")
     lines.append(f"- SPOF: label has seen only one distinct `runner_name` in the last {SPOF_LOOKBACK_DAYS} days.")
     lines.append(f"- Persistent runner: ran ≥ {PERSISTENT_RUNNER_MIN_JOBS} jobs in the lookback window AND served at least one label with ≤ {PERSISTENT_LABEL_MAX} distinct runners. Ephemeral auto-scaler worker names (which appear once per spawn) are excluded.")
     lines.append("- Re-runs: `(job_id, run_attempt)` tuples are distinct; a re-run counts as a new job.")
