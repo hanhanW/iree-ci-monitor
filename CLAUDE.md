@@ -51,8 +51,9 @@ iree-ci-monitor/
 ├── data/
 │   ├── .state.json                 # checkpoint (last_completed_run_id, open_run_ids)
 │   └── YYYY/MM/DD.jsonl            # one JSON object per job, UTC day bucket
-├── README.md                       # table-first dashboard (regenerated each tick)
-└── status.md                       # full per-label + per-runner detail (regenerated)
+├── README.md                       # table-first dashboard (regenerated each tick, 10h window)
+├── status.md                       # full per-label + per-runner detail (regenerated, 10h window)
+└── daily.md                        # snapshot of the most recently completed Pacific calendar day
 ```
 
 Data flow each tick:
@@ -64,8 +65,12 @@ Data flow each tick:
    (7d, per-runner + SPOF) of JSONL, computes stats, writes `README.md` +
    `status.md`. Window > tick interval gives ~4h overlap so a transient
    regression appears in two consecutive reports instead of "blink and miss".
-3. The workflow commits anything under `data/`, `README.md`, `status.md`.
-   Empty diffs are skipped. `CLAUDE.md` is not touched by the bot.
+   It also computes the most recently completed Pacific calendar day (midnight
+   to midnight local, DST-aware via `daily_window_pt`) and writes `daily.md`.
+   `daily.md` only changes when crossing midnight PT, so most ticks produce no
+   diff for it.
+3. The workflow commits anything under `data/`, `README.md`, `status.md`,
+   `daily.md`. Empty diffs are skipped. `CLAUDE.md` is not touched by the bot.
 
 ## Key Design Decisions
 

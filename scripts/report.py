@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Aggregate the last N hours of JSONL and regenerate README.md + status.md.
+"""Aggregate JSONL job records and regenerate README.md + status.md + daily.md.
 
-Reads data/YYYY/MM/DD.jsonl (today + yesterday if window crosses UTC midnight),
-computes per-label stats, applies alert rules, renders Markdown.
+Reads data/YYYY/MM/DD.jsonl, computes per-label stats over a rolling window
+(README + status) and over the most recently completed Pacific calendar day
+(daily), applies alert rules, renders Markdown.
 """
 
 from __future__ import annotations
@@ -22,6 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 README_PATH = ROOT / "README.md"
 STATUS_PATH = ROOT / "status.md"
+DAILY_PATH = ROOT / "daily.md"
 
 WINDOW_HOURS = 10
 SPOF_LOOKBACK_DAYS = 7
@@ -198,6 +200,29 @@ def files_in_window(now: datetime, window_hours: int) -> list[Path]:
     ]
 
 
+def files_in_range(start: datetime, end: datetime) -> list[Path]:
+    """JSONL paths covering every UTC calendar day touched by [start, end]."""
+    paths: list[Path] = []
+    cur = start.astimezone(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    last = end.astimezone(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    while cur <= last:
+        paths.append(DATA_DIR / f"{cur.year:04d}" / f"{cur.month:02d}" / f"{cur.day:02d}.jsonl")
+        cur += timedelta(days=1)
+    return paths
+
+
+def daily_window_pt(now: datetime) -> tuple[datetime, datetime]:
+    """UTC bounds of the most recently completed Pacific calendar day.
+
+    Returns [start, end). E.g. if `now` is 2026-04-23 14:00 PT, returns the
+    bounds of 2026-04-22 00:00 PT → 2026-04-23 00:00 PT.
+    """
+    pt_now = now.astimezone(DISPLAY_TZ)
+    end_pt = pt_now.replace(hour=0, minute=0, second=0, microsecond=0)
+    start_pt = end_pt - timedelta(days=1)
+    return start_pt.astimezone(timezone.utc), end_pt.astimezone(timezone.utc)
+
+
 def files_in_days(now: datetime, lookback_days: int) -> list[Path]:
     start = now - timedelta(days=lookback_days)
     paths: list[Path] = []
@@ -268,6 +293,52 @@ def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
                 if q >= 0:
                     s.qtimes.append((q, int(rec["run_id"]), int(rec["job_id"])))
 
+    return by_label
+
+
+def aggregate_period(start: datetime, end: datetime) -> dict[str, LabelStats]:
+    """Aggregate jobs with `created_at` in [start, end). Used for the daily
+    report: queued/running ages aren't tracked because they're a current-state
+    signal that doesn't apply to a historical window."""
+    by_label: dict[str, LabelStats] = {}
+    for path in files_in_range(start, end):
+        for rec in iter_jsonl(path):
+            created = parse_iso(rec.get("created_at"))
+            if created is None or created < start or created >= end:
+                continue
+            labels = rec.get("labels") or []
+            if not labels:
+                continue
+            key = ",".join(labels)
+            s = by_label.setdefault(key, LabelStats(label=key))
+            s.total += 1
+
+            status = rec.get("status")
+            concl = rec.get("conclusion")
+            main = is_main_post_merge(rec)
+            if status == "completed":
+                if concl == "success":
+                    s.all_ok += 1
+                    if main:
+                        s.main_ok += 1
+                elif concl == "failure":
+                    s.all_fail += 1
+                    if main:
+                        s.main_fail += 1
+                elif concl == "cancelled":
+                    s.all_cancelled += 1
+                    if main:
+                        s.main_cancelled += 1
+
+            rn = rec.get("runner_name")
+            if rn:
+                s.runners.add(rn)
+
+            started = parse_iso(rec.get("started_at"))
+            if started and concl != "skipped":
+                q = (started - created).total_seconds()
+                if q >= 0:
+                    s.qtimes.append((q, int(rec["run_id"]), int(rec["job_id"])))
     return by_label
 
 
@@ -443,7 +514,10 @@ def render_readme(
             lines.append(f"- **[{tag}]** {msg}")
     lines.append("")
 
-    lines.append("See [`status.md`](status.md) for the full per-label breakdown including all-jobs failure rates, methodology, and thresholds.")
+    lines.append(
+        "See [`status.md`](status.md) for the full per-label breakdown including all-jobs failure rates, methodology, and thresholds. "
+        "See [`daily.md`](daily.md) for a snapshot of the most recently completed Pacific calendar day."
+    )
     lines.append("")
     return "\n".join(lines)
 
@@ -560,6 +634,76 @@ def render_status(
     return "\n".join(lines)
 
 
+def render_daily(
+    now: datetime,
+    stats: dict[str, LabelStats],
+    spof: set[str],
+    start: datetime,
+    end: datetime,
+) -> str:
+    lines: list[str] = []
+    day_label = (end - timedelta(seconds=1)).astimezone(DISPLAY_TZ).strftime("%Y-%m-%d (%A)")
+    start_pt = start.astimezone(DISPLAY_TZ).strftime("%Y-%m-%d %H:%M %Z")
+    end_pt = end.astimezone(DISPLAY_TZ).strftime("%Y-%m-%d %H:%M %Z")
+    lines.append(f"# Daily report — {day_label}")
+    lines.append("")
+    lines.append(
+        f"_Updated: {fmt_updated(now)}_ — `iree-org/iree`, "
+        f"covering `{start_pt}` → `{end_pt}` (Pacific calendar day **{day_label}**)"
+    )
+    lines.append("")
+    lines.append(
+        "Snapshot of the most recently completed Pacific calendar day. Larger window than "
+        "the rolling [`status.md`](status.md) — better percentile stability and small-volume "
+        "labels can reach the failure-rate threshold. Refreshed each tick; content only "
+        "changes when crossing midnight Pacific time, so most ticks produce no diff."
+    )
+    lines.append("")
+
+    lines.append("## Per-label metrics")
+    lines.append("")
+    lines.append("| label | type | jobs | completed | p50 queue | p95 queue | max queue | all-jobs fail | main-only fail | runners | SPOF |")
+    lines.append("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|:---:|")
+    for s in sorted(stats.values(), key=lambda s: -s.p95):
+        completed = s.all_ok + s.all_fail + s.all_cancelled
+        main_completed = s.main_ok + s.main_fail + s.main_cancelled
+        fr_all = s.all_fail_rate
+        fr_main = s.main_fail_rate
+        fr_all_s = (
+            f"{fr_all:.0%} ({s.all_fail}/{completed})" if fr_all is not None else "—"
+        )
+        fr_main_s = (
+            f"{fr_main:.0%} ({s.main_fail}/{main_completed})" if fr_main is not None else "—"
+        )
+        if s.qtimes:
+            max_entry = max(s.qtimes)
+            max_q, max_ref = max_entry[0], (max_entry[1], max_entry[2])
+        else:
+            max_q, max_ref = 0.0, None
+        lines.append(
+            f"| `{s.label}` | {classify_label(s.label)} | {s.total} | {completed} | "
+            f"{fmt_oldest(s.p50, s.p50_ref)} | {fmt_oldest(s.p95, s.p95_ref)} | "
+            f"{fmt_oldest(max_q, max_ref)} | "
+            f"{fr_all_s} | {fr_main_s} | "
+            f"{len(s.runners)} | {'yes' if s.label in spof else ''} |"
+        )
+    lines.append("")
+
+    lines.append("## Methodology")
+    lines.append("")
+    lines.append(
+        f"- Window: jobs with `created_at` in the previous `{DISPLAY_TZ.key}` calendar day "
+        "(24h, midnight to midnight local). Bounds shift at midnight PT regardless of DST."
+    )
+    lines.append(
+        "- Live state (queued/running counts and oldest-queued/oldest-running ages) is omitted: "
+        "this is a historical view, those signals only make sense in the rolling window."
+    )
+    lines.append("- See [`status.md`](status.md) for full methodology, runner table, and alert thresholds.")
+    lines.append("")
+    return "\n".join(lines)
+
+
 def main() -> None:
     now = datetime.now(timezone.utc)
     stats = aggregate(now, WINDOW_HOURS)
@@ -567,11 +711,16 @@ def main() -> None:
     spof = spof_labels_from(label_runners)
     alerts = build_alerts(stats, spof)
 
+    daily_start, daily_end = daily_window_pt(now)
+    daily_stats = aggregate_period(daily_start, daily_end)
+
     README_PATH.write_text(render_readme(now, stats, alerts, runners, label_runners))
     STATUS_PATH.write_text(render_status(now, stats, alerts, spof, runners, label_runners))
+    DAILY_PATH.write_text(render_daily(now, daily_stats, spof, daily_start, daily_end))
     print(
         f"[report] labels={len(stats)} alerts={len(alerts)} "
-        f"spof={len(spof)} runners={len(runners)}",
+        f"spof={len(spof)} runners={len(runners)} "
+        f"daily_labels={len(daily_stats)}",
         flush=True,
     )
 

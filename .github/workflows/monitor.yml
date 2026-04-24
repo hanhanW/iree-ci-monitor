@@ -35,7 +35,7 @@ jobs:
         run: |
           git config user.name "iree-ci-monitor[bot]"
           git config user.email "iree-ci-monitor[bot]@users.noreply.github.com"
-          git add -A data README.md status.md
+          git add -A data README.md status.md daily.md
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
