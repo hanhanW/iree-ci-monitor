@@ -414,16 +414,6 @@ def is_persistent_runner(r: RunnerStats, label_runners: dict[str, set[str]]) -> 
     return False
 
 
-def fmt_labels_short(labels: set[str], limit: int = 2) -> str:
-    if not labels:
-        return "—"
-    items = sorted(labels)
-    if len(items) <= limit:
-        return ", ".join(f"`{L}`" for L in items)
-    head = ", ".join(f"`{L}`" for L in items[:limit])
-    return f"{head}, +{len(items) - limit} more"
-
-
 def spof_labels_from(label_runners: dict[str, set[str]]) -> set[str]:
     return {lab for lab, rs in label_runners.items() if len(rs) == 1}
 
@@ -493,12 +483,16 @@ def render_readme(
     for s in sorted(stats.values(), key=lambda s: -s.p95):
         fr = s.main_fail_rate
         fr_s = f"{fr:.0%} ({s.main_fail}/{s.main_ok + s.main_fail + s.main_cancelled})" if fr is not None else "—"
+        if classify_label(s.label) == "self-hosted" and s.runners:
+            runners_s = ", ".join(f"`{n}`" for n in sorted(s.runners))
+        else:
+            runners_s = str(len(s.runners))
         lines.append(
             f"| `{s.label}` | {classify_label(s.label)} | {s.total} | {s.queued} | "
             f"{fmt_oldest(s.oldest_queued_s, s.oldest_queued_ref) if s.queued else '—'} | "
             f"{s.in_progress} | "
             f"{fmt_oldest(s.p50, s.p50_ref)} | {fmt_oldest(s.p95, s.p95_ref)} | "
-            f"{fr_s} | {len(s.runners)} |"
+            f"{fr_s} | {runners_s} |"
         )
     lines.append("")
 
@@ -514,12 +508,13 @@ def render_readme(
         lines.append("| runner | labels | jobs | fail rate | running | last seen |")
         lines.append("|---|---|---:|---:|:---:|---:|")
         for r in persistent:
+            labels_s = ", ".join(f"`{L}`" for L in sorted(r.labels)) if r.labels else "—"
             fr = r.fail_rate
             fr_s = f"{fr:.0%} ({r.fail}/{r.completed})" if fr is not None else "—"
             running = "yes" if r.running > 0 else ""
             last_s = "running" if r.running > 0 else fmt_when(now, r.last_seen_at)
             lines.append(
-                f"| `{r.name}` | {fmt_labels_short(r.labels)} | {r.total} | "
+                f"| `{r.name}` | {labels_s} | {r.total} | "
                 f"{fr_s} | {running} | {last_s} |"
             )
     lines.append("")
