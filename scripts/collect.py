@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 STATE_PATH = DATA_DIR / ".state.json"
 
-RESCAN_HOURS = 2
+RESCAN_HOURS = 7
 INITIAL_BACKFILL_HOURS = 24
 MAX_PAGES = 60  # safety cap on pagination depth; raises on hit
 MAX_OPEN_AGE_DAYS = 3  # drop tracked open runs older than this

@@ -5,7 +5,7 @@ Guidance for Claude Code when working in this repository.
 ## Overview
 
 **Repository:** Automated GitHub Actions runner health monitor for `iree-org/iree`.
-A GitHub Actions cron (hourly) runs `scripts/collect.py` (pulls new run+job
+A GitHub Actions cron (every 6h) runs `scripts/collect.py` (pulls new run+job
 metadata via the REST API) and `scripts/report.py` (regenerates `README.md` +
 `status.md`), then auto-commits the refresh. The dashboard *is* the committed
 Markdown — readers just visit the repo.
@@ -44,7 +44,7 @@ mislead triage. Favor fewer, correct signals over many noisy ones.
 
 ```
 iree-ci-monitor/
-├── .github/workflows/monitor.yml   # hourly cron + workflow_dispatch
+├── .github/workflows/monitor.yml   # 6h cron + workflow_dispatch
 ├── scripts/
 │   ├── collect.py                  # fetch new runs+jobs, append JSONL
 │   └── report.py                   # aggregate + render Markdown
@@ -57,12 +57,13 @@ iree-ci-monitor/
 
 Data flow each tick:
 
-1. `collect.py` scans `/actions/runs?created>=now-2h`, unions with
-   `open_run_ids`, pulls `/actions/runs/{id}/jobs` for each, normalizes,
-   dedupes, appends.
-2. `report.py` reads the last `WINDOW_HOURS` (6h, labels) and `RUNNER_LOOKBACK_DAYS`
+1. `collect.py` scans `/actions/runs?created>=now-RESCAN_HOURS` (7h, one
+   tick + 1h margin), unions with `open_run_ids`, pulls
+   `/actions/runs/{id}/jobs` for each, normalizes, dedupes, appends.
+2. `report.py` reads the last `WINDOW_HOURS` (10h, labels) and `RUNNER_LOOKBACK_DAYS`
    (7d, per-runner + SPOF) of JSONL, computes stats, writes `README.md` +
-   `status.md`.
+   `status.md`. Window > tick interval gives ~4h overlap so a transient
+   regression appears in two consecutive reports instead of "blink and miss".
 3. The workflow commits anything under `data/`, `README.md`, `status.md`.
    Empty diffs are skipped. `CLAUDE.md` is not touched by the bot.
 
@@ -121,7 +122,7 @@ Before pushing a change to `scripts/`:
    ```
    Verify `data/YYYY/MM/DD.jsonl` only grew on the first run.
 
-3. **Trigger the workflow in CI** rather than waiting for the hourly cron:
+3. **Trigger the workflow in CI** rather than waiting for the 6h cron:
    ```bash
    gh workflow run monitor.yml
    gh run list --workflow=monitor.yml --limit 3
@@ -131,12 +132,12 @@ Before pushing a change to `scripts/`:
 ## GHA and rate-limit constraints
 
 - Currently private. Personal accounts get 2,000 free GHA minutes/mo for
-  private repos. Each tick is ~1 min; hourly cadence burns ~720 min/mo —
-  comfortable margin. If the job grows to threaten that budget, flip the
+  private repos. Each tick is ~1 min; 6h cadence burns ~120 min/mo —
+  plenty of headroom. If the job grows to threaten that budget, flip the
   repo to public (unlimited on public repos) or trim cadence.
 - `GITHUB_TOKEN` inside the workflow has a 1,000/hr primary rate limit. One
-  tick makes ~30–60 API calls (one paginated `/actions/runs` scan + one
-  `/jobs` call per run). Plenty of headroom.
+  tick makes ~100–200 API calls with the 7h rescan window (one paginated
+  `/actions/runs` scan + one `/jobs` call per run). Well under the cap.
 - `concurrency: monitor` prevents scheduled + manual dispatches from
   overlapping.
 

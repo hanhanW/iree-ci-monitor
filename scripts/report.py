@@ -23,7 +23,7 @@ DATA_DIR = ROOT / "data"
 README_PATH = ROOT / "README.md"
 STATUS_PATH = ROOT / "status.md"
 
-WINDOW_HOURS = 6
+WINDOW_HOURS = 10
 SPOF_LOOKBACK_DAYS = 7
 RUNNER_LOOKBACK_DAYS = 7
 # Labels with more distinct runners than this over the lookback window are treated
