@@ -1,6 +1,6 @@
 # Daily report — 2026-04-24 (Friday)
 
-_Updated: 2026-04-25 05:32 PDT_ — `iree-org/iree`, covering `2026-04-24 00:00 PDT` → `2026-04-25 00:00 PDT` (Pacific calendar day **2026-04-24 (Friday)**)
+_Updated: 2026-04-25 11:31 PDT_ — `iree-org/iree`, covering `2026-04-24 00:00 PDT` → `2026-04-25 00:00 PDT` (Pacific calendar day **2026-04-24 (Friday)**)
 
 Snapshot of the most recently completed Pacific calendar day. Larger window than the rolling [`status.md`](status.md) — better percentile stability and small-volume labels can reach the failure-rate threshold. Refreshed each tick; content only changes when crossing midnight Pacific time, so most ticks produce no diff.
 
