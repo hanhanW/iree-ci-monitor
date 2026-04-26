@@ -1,6 +1,6 @@
 # iree-ci-monitor
 
-_Updated: 2026-04-26 05:32 PDT_ — `iree-org/iree`, last 10h
+_Updated: 2026-04-26 11:31 PDT_ — `iree-org/iree`, last 10h
 
 Automated tracker of GitHub Actions runner health for the IREE project. 
 Each tick, the collector pulls new run+job metadata via the GitHub REST API and the reporter regenerates this page.
@@ -9,10 +9,8 @@ Each tick, the collector pulls new run+job metadata via the GitHub REST API and 
 
 | label | type | jobs | queued | oldest queued | running | p50 queue | p95 queue | main fail rate | runners |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `ubuntu-24.04` | github-hosted | 11 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/24949550708/job/73057126256) | [3s](https://github.com/iree-org/iree/actions/runs/24954826040/job/73071154434) | 0% (0/1) | 10 |
-| `ubuntu-24.04-arm` | github-hosted | 3 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/24949550708/job/73057126264) | [3s](https://github.com/iree-org/iree/actions/runs/24949550708/job/73057126271) | — | 3 |
-| `macos-14` | github-hosted | 2 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/24949550708/job/73057126263) | [3s](https://github.com/iree-org/iree/actions/runs/24949550708/job/73057126279) | — | 2 |
-| `windows-2022` | github-hosted | 2 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/24949550708/job/73057126259) | [2s](https://github.com/iree-org/iree/actions/runs/24949550708/job/73057126280) | — | 2 |
+| `ubuntu-24.04` | github-hosted | 4 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/24958716736/job/73081465989) | [3s](https://github.com/iree-org/iree/actions/runs/24954826040/job/73071154434) | 0% (0/1) | 3 |
+| `ubuntu-latest` | github-hosted | 7 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/24958829598/job/73081795282) | [3s](https://github.com/iree-org/iree/actions/runs/24958829765/job/73081780650) | 0% (0/2) | 7 |
 
 ## Self-hosted runners (last 7d)
 
