@@ -1,13 +1,11 @@
 # Status detail
 
-_Updated: 2026-04-26 11:31 PDT_ — watching `iree-org/iree`, window = last 10h
+_Updated: 2026-04-26 18:08 PDT_ — watching `iree-org/iree`, window = last 10h
 
 ## Per-label metrics
 
 | label | type | jobs | queued | oldest queued | running | oldest running | avg | p50 | p95 | max | all-jobs fail | main-only fail | runners | SPOF |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|
-| `ubuntu-24.04` | github-hosted | 4 | 0 | — | 0 | — | 2s | [2s](https://github.com/iree-org/iree/actions/runs/24958716736/job/73081465989) | [3s](https://github.com/iree-org/iree/actions/runs/24954826040/job/73071154434) | [3s](https://github.com/iree-org/iree/actions/runs/24954826040/job/73071154434) | 33% (1/3) | 0% (0/1) | 3 |  |
-| `ubuntu-latest` | github-hosted | 7 | 0 | — | 0 | — | 2s | [2s](https://github.com/iree-org/iree/actions/runs/24958829598/job/73081795282) | [3s](https://github.com/iree-org/iree/actions/runs/24958829765/job/73081780650) | [3s](https://github.com/iree-org/iree/actions/runs/24958829765/job/73081780650) | 29% (2/7) | 0% (0/2) | 7 |  |
 
 ## Per-runner metrics (self-hosted, last 7d)
 
