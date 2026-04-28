@@ -1,6 +1,6 @@
 # iree-ci-monitor
 
-_Updated: 2026-04-28 05:58 PDT_ — `iree-org/iree`, last 10h
+_Updated: 2026-04-28 11:55 PDT_ — `iree-org/iree`, last 10h
 
 Automated tracker of GitHub Actions runner health for the IREE project. 
 Each tick, the collector pulls new run+job metadata via the GitHub REST API and the reporter regenerates this page.
@@ -9,56 +9,57 @@ Each tick, the collector pulls new run+job metadata via the GitHub REST API and 
 
 | label | type | jobs | queued | oldest queued | running | p50 queue | p95 queue | main fail rate | runners |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `Linux,X64,gfx1201` | self-hosted | 24 | 5 | [8h45m](https://github.com/iree-org/iree/actions/runs/25033295352/job/73319978532) | 1 | [3h36m](https://github.com/iree-org/iree/actions/runs/25036878947/job/73333392682) | [6h25m](https://github.com/iree-org/iree/actions/runs/25032162739/job/73316989188) | — | `shark75-ci` |
-| `Linux,X64,gfx1201,persistent-cache` | self-hosted | 12 | 0 | — | 0 | [3h31m](https://github.com/iree-org/iree/actions/runs/25036878947/job/73333392519) | [6h13m](https://github.com/iree-org/iree/actions/runs/25033295352/job/73319978539) | 0% (0/3) | `shark75-ci` |
-| `Linux,X64,iree-w7900x2,persistent-cache` | self-hosted | 12 | 0 | — | 0 | [3h29m](https://github.com/iree-org/iree/actions/runs/25037262481/job/73334325071) | [4h43m](https://github.com/iree-org/iree/actions/runs/25034506099/job/73323661848) | 0% (0/3) | `shark01-ci` |
-| `self-hosted,persistent-cache,Linux,X64,threadripper` | self-hosted | 12 | 0 | — | 0 | [3h25m](https://github.com/iree-org/iree/actions/runs/25034506099/job/73323661792) | [4h13m](https://github.com/iree-org/iree/actions/runs/25036522879/job/73332604004) | 0% (0/3) | `shark01-ci` |
-| `Linux,X64,iree-w7900` | self-hosted | 12 | 0 | — | 0 | [2h14m](https://github.com/iree-org/iree/actions/runs/25034506099/job/73323661799) | [3h38m](https://github.com/iree-org/iree/actions/runs/25037869894/job/73337283859) | 0% (0/3) | `shark01-ci` |
-| `Linux,X64,gfx1100` | self-hosted | 24 | 0 | — | 0 | [2h17m](https://github.com/iree-org/iree/actions/runs/25036522879/job/73332604138) | [3h24m](https://github.com/iree-org/iree/actions/runs/25037262481/job/73334325138) | 0% (0/6) | `shark01-ci`, `shark55-ci` |
-| `Linux,X64,rdna3` | self-hosted | 12 | 0 | — | 0 | [2h12m](https://github.com/iree-org/iree/actions/runs/25031463022/job/73317088684) | [3h12m](https://github.com/iree-org/iree/actions/runs/25037262481/job/73334325141) | 0% (0/3) | `shark01-ci`, `shark55-ci` |
-| `Linux,X64,iree-r9700` | self-hosted | 12 | 0 | — | 0 | [2h09m](https://github.com/iree-org/iree/actions/runs/25036522879/job/73332603918) | [3h12m](https://github.com/iree-org/iree/actions/runs/25037262481/job/73334324988) | 0% (0/3) | `shark75-ci` |
-| `self-hosted,persistent-cache,Linux,X64` | self-hosted | 36 | 0 | — | 0 | [2h10m](https://github.com/iree-org/iree/actions/runs/25031463022/job/73317088707) | [3h12m](https://github.com/iree-org/iree/actions/runs/25037869894/job/73337283800) | 0% (0/9) | `shark01-ci`, `shark55-ci`, `shark75-ci` |
-| `Linux,X64,gfx1100,persistent-cache` | self-hosted | 12 | 0 | — | 0 | [1h56m](https://github.com/iree-org/iree/actions/runs/25031463022/job/73317088679) | [2h32m](https://github.com/iree-org/iree/actions/runs/25036878947/job/73333392539) | 0% (0/3) | `shark01-ci`, `shark55-ci` |
-| `azure-linux-scale` | ossci | 81 | 3 | [1m53s](https://github.com/iree-org/iree/actions/runs/25054099963/job/73389514389) | 3 | [59s](https://github.com/iree-org/iree/actions/runs/25034506085/job/73323106027) | [23m11s](https://github.com/iree-org/iree/actions/runs/25036522889/job/73329401706) | 0% (0/20) | 73 |
-| `nodai-amdgpu-mi308-x86-64` | self-hosted | 12 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25034506099/job/73323661915) | [6m01s](https://github.com/iree-org/iree/actions/runs/25037262481/job/73334325042) | 0% (0/3) | `iree-mi308-1` |
-| `windows-2022` | github-hosted | 47 | 0 | — | 3 | [3s](https://github.com/iree-org/iree/actions/runs/25034506085/job/73323105900) | [3m53s](https://github.com/iree-org/iree/actions/runs/25037869922/job/73333682584) | 0% (0/9) | 47 |
-| `macos-14` | github-hosted | 48 | 0 | — | 4 | [4s](https://github.com/iree-org/iree/actions/runs/25046436311/job/73362627042) | [3m38s](https://github.com/iree-org/iree/actions/runs/25036878943/job/73330640407) | 0% (0/9) | 48 |
-| `ubuntu-24.04-arm` | github-hosted | 48 | 0 | — | 3 | [2s](https://github.com/iree-org/iree/actions/runs/25036522889/job/73329401541) | [2m09s](https://github.com/iree-org/iree/actions/runs/25036878943/job/73330640410) | 0% (0/9) | 48 |
-| `ubuntu-24.04` | github-hosted | 243 | 0 | — | 7 | [2s](https://github.com/iree-org/iree/actions/runs/25037262407/job/73331723566) | [1m46s](https://github.com/iree-org/iree/actions/runs/25033514284/job/73320093409) | 0% (0/53) | 243 |
-| `ah-ubuntu_22_04-c7g_4x-50` | github-hosted | 1 | 0 | — | 0 | [1m41s](https://github.com/iree-org/iree/actions/runs/25046449719/job/73362674548) | [1m41s](https://github.com/iree-org/iree/actions/runs/25046449719/job/73362674548) | 0% (0/1) | 1 |
-| `linux-mi325-1gpu-ossci-iree-org` | ossci | 48 | 0 | — | 0 | [8s](https://github.com/iree-org/iree/actions/runs/25034982190/job/73325359521) | [1m18s](https://github.com/iree-org/iree/actions/runs/25031463022/job/73317088579) | 8% (1/12) | 48 |
-| `ubuntu-latest` | github-hosted | 40 | 0 | — | 2 | [3s](https://github.com/iree-org/iree/actions/runs/25037261513/job/73331723583) | [4s](https://github.com/iree-org/iree/actions/runs/25054098634/job/73389478775) | 0% (0/6) | 40 |
-| `macos-15-intel` | github-hosted | 1 | 0 | — | 1 | [3s](https://github.com/iree-org/iree/actions/runs/25046431930/job/73362613190) | [3s](https://github.com/iree-org/iree/actions/runs/25046431930/job/73362613190) | — | 1 |
-| `azure-windows-scale` | ossci | 15 | 0 | — | 1 | [1s](https://github.com/iree-org/iree/actions/runs/25036362687/job/73328917648) | [2s](https://github.com/iree-org/iree/actions/runs/25054099963/job/73389514564) | 0% (0/3) | 15 |
-| `linux-mi35x-1gpu-ossci-iree-org` | ossci | 12 | 0 | — | 0 | [1s](https://github.com/iree-org/iree/actions/runs/25037869894/job/73337283814) | [2s](https://github.com/iree-org/iree/actions/runs/25036522879/job/73332603960) | 0% (0/3) | 12 |
-| `Linux,X64,rdna3,persistent-cache,shark10-ci` | self-hosted | 12 | 9 | [9h22m](https://github.com/iree-org/iree/actions/runs/25032162739/job/73316989167) | 0 | [0s](https://github.com/iree-org/iree/actions/runs/25033911199/job/73321957973) | [0s](https://github.com/iree-org/iree/actions/runs/25034982190/job/73325359496) | — | 0 |
-| `Linux,X64,rdna3,shark10-ci` | self-hosted | 12 | 9 | [9h22m](https://github.com/iree-org/iree/actions/runs/25032162739/job/73316989223) | 0 | [0s](https://github.com/iree-org/iree/actions/runs/25033911199/job/73321958036) | [0s](https://github.com/iree-org/iree/actions/runs/25034982190/job/73325359539) | — | 0 |
+| `Linux,X64,gfx1201` | self-hosted | 55 | 27 | [1h29m](https://github.com/iree-org/iree/actions/runs/25066557925/job/73439328419) | 1 | [1h00m](https://github.com/iree-org/iree/actions/runs/25061206090/job/73420571606) | [2h01m](https://github.com/iree-org/iree/actions/runs/25065529495/job/73432983818) | 0% (0/8) | `shark75-ci` |
+| `Linux,X64,iree-w7900x2,persistent-cache` | self-hosted | 26 | 13 | [1h47m](https://github.com/iree-org/iree/actions/runs/25066373725/job/73436290717) | 0 | [1h20m](https://github.com/iree-org/iree/actions/runs/25066557925/job/73439328367) | [1h55m](https://github.com/iree-org/iree/actions/runs/25059642220/job/73417592555) | 0% (0/5) | `shark01-ci` |
+| `self-hosted,persistent-cache,Linux,X64,threadripper` | self-hosted | 29 | 14 | [1h29m](https://github.com/iree-org/iree/actions/runs/25066557925/job/73439328413) | 0 | [57m19s](https://github.com/iree-org/iree/actions/runs/25059794993/job/73412014075) | [1h50m](https://github.com/iree-org/iree/actions/runs/25065356772/job/73432108027) | 0% (0/4) | `shark01-ci` |
+| `Linux,X64,iree-w7900` | self-hosted | 26 | 13 | [1h29m](https://github.com/iree-org/iree/actions/runs/25066557925/job/73439328372) | 0 | [1h00m](https://github.com/iree-org/iree/actions/runs/25065356772/job/73432107815) | [1h33m](https://github.com/iree-org/iree/actions/runs/25061206090/job/73420571563) | 0% (0/4) | `shark01-ci` |
+| `Linux,X64,gfx1201,persistent-cache` | self-hosted | 26 | 14 | [1h47m](https://github.com/iree-org/iree/actions/runs/25066373725/job/73436290762) | 0 | [1h00m](https://github.com/iree-org/iree/actions/runs/25063327979/job/73424951796) | [1h28m](https://github.com/iree-org/iree/actions/runs/25065840917/job/73434370049) | 0% (0/4) | `shark75-ci` |
+| `self-hosted,persistent-cache,Linux,X64` | self-hosted | 81 | 36 | [1h21m](https://github.com/iree-org/iree/actions/runs/25067774560/job/73440728188) | 1 | [53m21s](https://github.com/iree-org/iree/actions/runs/25065356772/job/73432107991) | [1h25m](https://github.com/iree-org/iree/actions/runs/25066373725/job/73436290761) | 0% (0/15) | `shark01-ci`, `shark55-ci`, `shark75-ci` |
+| `Linux,X64,gfx1100,persistent-cache` | self-hosted | 26 | 12 | [1h21m](https://github.com/iree-org/iree/actions/runs/25067774560/job/73440728323) | 0 | [51m33s](https://github.com/iree-org/iree/actions/runs/25059642220/job/73417592427) | [1h22m](https://github.com/iree-org/iree/actions/runs/25065840917/job/73434370056) | 0% (0/5) | `shark01-ci`, `shark55-ci` |
+| `Linux,X64,gfx1100` | self-hosted | 55 | 25 | [1h21m](https://github.com/iree-org/iree/actions/runs/25067774560/job/73440728190) | 1 | [47m02s](https://github.com/iree-org/iree/actions/runs/25059688262/job/73411724584) | [1h21m](https://github.com/iree-org/iree/actions/runs/25066557925/job/73439328505) | 0% (0/9) | `shark01-ci`, `shark55-ci` |
+| `Linux,X64,iree-r9700` | self-hosted | 26 | 12 | [1h47m](https://github.com/iree-org/iree/actions/runs/25066373725/job/73436290656) | 0 | [41m06s](https://github.com/iree-org/iree/actions/runs/25067774560/job/73440728244) | [1h21m](https://github.com/iree-org/iree/actions/runs/25065529495/job/73432983531) | 20% (1/5) | `shark75-ci` |
+| `Linux,X64,rdna3` | self-hosted | 26 | 12 | [1h21m](https://github.com/iree-org/iree/actions/runs/25067774560/job/73440728375) | 0 | [45m44s](https://github.com/iree-org/iree/actions/runs/25065007783/job/73430853516) | [1h19m](https://github.com/iree-org/iree/actions/runs/25066557925/job/73439328384) | 0% (0/5) | `shark01-ci`, `shark55-ci` |
+| `nodai-amdgpu-mi308-x86-64` | self-hosted | 26 | 5 | [49m12s](https://github.com/iree-org/iree/actions/runs/25069152880/job/73445937914) | 1 | [7m09s](https://github.com/iree-org/iree/actions/runs/25059642220/job/73417592526) | [33m41s](https://github.com/iree-org/iree/actions/runs/25068679996/job/73444430638) | 0% (0/7) | `iree-mi308-1` |
+| `linux-mi325-1gpu-ossci-iree-org` | ossci | 110 | 0 | — | 1 | [20s](https://github.com/iree-org/iree/actions/runs/25059688262/job/73411724752) | [7m23s](https://github.com/iree-org/iree/actions/runs/25059794993/job/73412013983) | 0% (0/40) | 110 |
+| `ubuntu-24.04` | github-hosted | 465 | 0 | — | 4 | [10s](https://github.com/iree-org/iree/actions/runs/25063327979/job/73424951745) | [6m00s](https://github.com/iree-org/iree/actions/runs/25069152880/job/73445937926) | 3% (5/158) | 457 |
+| `ubuntu-latest` | github-hosted | 73 | 0 | — | 0 | [4s](https://github.com/iree-org/iree/actions/runs/25070437715/job/73448955368) | [4m32s](https://github.com/iree-org/iree/actions/runs/25068946169/job/73443665256) | 0% (0/20) | 73 |
+| `macos-14` | github-hosted | 86 | 0 | — | 1 | [9s](https://github.com/iree-org/iree/actions/runs/25061098434/job/73415187934) | [3m16s](https://github.com/iree-org/iree/actions/runs/25069035476/job/73445612324) | 3% (1/31) | 83 |
+| `ubuntu-24.04-arm` | github-hosted | 84 | 0 | — | 0 | [27s](https://github.com/iree-org/iree/actions/runs/25068038972/job/73440448740) | [3m07s](https://github.com/iree-org/iree/actions/runs/25070801600/job/73450355436) | 0% (0/30) | 79 |
+| `windows-2022` | github-hosted | 84 | 0 | — | 0 | [20s](https://github.com/iree-org/iree/actions/runs/25065529541/job/73431600318) | [2m54s](https://github.com/iree-org/iree/actions/runs/25068170751/job/73441572432) | 3% (1/30) | 78 |
+| `ah-ubuntu_22_04-c7g_4x-50` | github-hosted | 2 | 0 | — | 1 | [1m25s](https://github.com/iree-org/iree/actions/runs/25070441619/job/73448995260) | [1m41s](https://github.com/iree-org/iree/actions/runs/25046449719/job/73362674548) | 0% (0/1) | 2 |
+| `azure-linux-scale` | ossci | 157 | 0 | — | 3 | [9s](https://github.com/iree-org/iree/actions/runs/25067774504/job/73439514539) | [1m27s](https://github.com/iree-org/iree/actions/runs/25068038972/job/73440448932) | 24% (15/62) | 157 |
+| `azure-windows-scale` | ossci | 28 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25054099963/job/73389514564) | [1m24s](https://github.com/iree-org/iree/actions/runs/25059794862/job/73410518952) | 40% (4/10) | 28 |
+| `macos-15-intel` | github-hosted | 2 | 0 | — | 1 | [3s](https://github.com/iree-org/iree/actions/runs/25046431930/job/73362613190) | [4s](https://github.com/iree-org/iree/actions/runs/25070441619/job/73448995184) | 0% (0/1) | 2 |
+| `linux-mi35x-1gpu-ossci-iree-org` | ossci | 26 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25065007783/job/73430853205) | [2s](https://github.com/iree-org/iree/actions/runs/25070801494/job/73451698271) | 10% (1/10) | 26 |
+| `Linux,X64,rdna3,persistent-cache,shark10-ci` | self-hosted | 26 | 25 | [5h48m](https://github.com/iree-org/iree/actions/runs/25054099930/job/73391238519) | 0 | [0s](https://github.com/iree-org/iree/actions/runs/25065491548/job/73433099189) | [0s](https://github.com/iree-org/iree/actions/runs/25065491548/job/73433099189) | — | 0 |
+| `Linux,X64,rdna3,shark10-ci` | self-hosted | 29 | 26 | [5h48m](https://github.com/iree-org/iree/actions/runs/25054099930/job/73391238540) | 0 | [0s](https://github.com/iree-org/iree/actions/runs/25054878408/job/73392268628) | [0s](https://github.com/iree-org/iree/actions/runs/25065491548/job/73433099487) | — | 0 |
 
 ## Self-hosted runners (last 7d)
 
 | runner | labels | jobs | fail rate | running | last seen |
 |---|---|---:|---:|:---:|---:|
-| `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 558 | 2% (10/553) | yes | running |
-| `shark01-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 490 | 3% (14/485) | yes | running |
-| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64` | 463 | 1% (6/459) | yes | running |
-| `iree-mi308-1` | `nodai-amdgpu-mi308-x86-64` | 160 | 1% (1/157) | yes | running |
+| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64` | 521 | 1% (7/516) | yes | running |
+| `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 626 | 2% (15/621) | yes | running |
+| `shark01-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 555 | 3% (16/549) | yes | running |
+| `iree-mi308-1` | `nodai-amdgpu-mi308-x86-64` | 180 | 1% (1/176) | yes | running |
 | `shark10-ci-2` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache,shark10-ci`, `Linux,X64,rdna3,shark10-ci`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 466 | 14% (63/462) | yes | running |
 
 ## Alerts
 
-- **[stale-queued]** `Linux,X64,gfx1201` oldest queued job waiting 8h45m (> 2h00m)
-- **[stale-queued]** `Linux,X64,rdna3,persistent-cache,shark10-ci` oldest queued job waiting 9h22m (> 2h00m)
-- **[stale-queued]** `Linux,X64,rdna3,shark10-ci` oldest queued job waiting 9h22m (> 2h00m)
-- **[queue-starved]** `Linux,X64,gfx1100,persistent-cache` p95 queue 2h32m (> 1h00m)
-- **[queue-starved]** `Linux,X64,gfx1100` p95 queue 3h24m (> 1h00m)
-- **[queue-starved]** `Linux,X64,gfx1201,persistent-cache` p95 queue 6h13m (> 1h00m)
-- **[queue-starved]** `Linux,X64,gfx1201` p95 queue 6h25m (> 1h00m)
-- **[queue-starved]** `Linux,X64,iree-r9700` p95 queue 3h12m (> 1h00m)
-- **[queue-starved]** `Linux,X64,iree-w7900` p95 queue 3h38m (> 1h00m)
-- **[queue-starved]** `Linux,X64,iree-w7900x2,persistent-cache` p95 queue 4h43m (> 1h00m)
-- **[queue-starved]** `Linux,X64,rdna3` p95 queue 3h12m (> 1h00m)
-- **[queue-starved]** `self-hosted,persistent-cache,Linux,X64,threadripper` p95 queue 4h13m (> 1h00m)
-- **[queue-starved]** `self-hosted,persistent-cache,Linux,X64` p95 queue 3h12m (> 1h00m)
+- **[stale-queued]** `Linux,X64,rdna3,persistent-cache,shark10-ci` oldest queued job waiting 5h48m (> 2h00m)
+- **[stale-queued]** `Linux,X64,rdna3,shark10-ci` oldest queued job waiting 5h48m (> 2h00m)
+- **[queue-starved]** `Linux,X64,gfx1100,persistent-cache` p95 queue 1h22m (> 1h00m)
+- **[queue-starved]** `Linux,X64,gfx1100` p95 queue 1h21m (> 1h00m)
+- **[queue-starved]** `Linux,X64,gfx1201,persistent-cache` p95 queue 1h28m (> 1h00m)
+- **[queue-starved]** `Linux,X64,gfx1201` p95 queue 2h01m (> 1h00m)
+- **[queue-starved]** `Linux,X64,iree-r9700` p95 queue 1h21m (> 1h00m)
+- **[queue-starved]** `Linux,X64,iree-w7900` p95 queue 1h33m (> 1h00m)
+- **[queue-starved]** `Linux,X64,iree-w7900x2,persistent-cache` p95 queue 1h55m (> 1h00m)
+- **[queue-starved]** `Linux,X64,rdna3` p95 queue 1h19m (> 1h00m)
+- **[queue-starved]** `self-hosted,persistent-cache,Linux,X64,threadripper` p95 queue 1h50m (> 1h00m)
+- **[queue-starved]** `self-hosted,persistent-cache,Linux,X64` p95 queue 1h25m (> 1h00m)
+- **[high-failure-main]** `azure-linux-scale` main-branch failure rate 24% (15/62)
+- **[high-failure-main]** `azure-windows-scale` main-branch failure rate 40% (4/10)
 - **[spof]** `Linux,X64,gfx1201,persistent-cache` single runner observed in last 7d
 - **[spof]** `Linux,X64,gfx1201` single runner observed in last 7d
 - **[spof]** `Linux,X64,iree-r9700` single runner observed in last 7d
