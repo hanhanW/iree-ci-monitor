@@ -1,11 +1,15 @@
 # Status detail
 
-_Updated: 2026-05-02 18:14 PDT_ — watching `iree-org/iree`, window = last 10h
+_Updated: 2026-05-03 00:09 PDT_ — watching `iree-org/iree`, window = last 10h
 
 ## Per-label metrics
 
 | label | type | jobs | queued | oldest queued | running | oldest running | avg | p50 | p95 | max | all-jobs fail | main-only fail | runners | SPOF |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|
+| `ubuntu-24.04` | github-hosted | 6 | 0 | — | 2 | [1h05m](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664148) | 3s | [2s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664148) | [8s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664150) | [8s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664150) | 0% (0/4) | 0% (0/1) | 6 |  |
+| `ubuntu-24.04-arm` | github-hosted | 3 | 0 | — | 2 | [1h05m](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664145) | 2s | [3s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664145) | [3s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664147) | [3s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664147) | 0% (0/1) | — | 3 |  |
+| `macos-14` | github-hosted | 2 | 0 | — | 1 | [1h05m](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664151) | 2s | [2s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664151) | [3s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664168) | [3s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664168) | 0% (0/1) | — | 2 |  |
+| `windows-2022` | github-hosted | 2 | 0 | — | 1 | [1h05m](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664165) | 2s | [2s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664165) | [2s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664170) | [2s](https://github.com/iree-org/iree/actions/runs/25271522649/job/74094664170) | 0% (0/1) | — | 2 |  |
 
 ## Per-runner metrics (self-hosted, last 7d)
 
@@ -15,10 +19,10 @@ Only runners that served at least one label with ≤ 15 distinct runners in the 
 |---|---|---:|---:|---:|---:|---:|:---:|---:|
 | `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 1024 | 961 | 54 | 8 | 5% | yes | running |
 | `shark01-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 885 | 854 | 24 | 6 | 3% | yes | running |
-| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64` | 799 | 784 | 11 | 4 | 1% |  | 19h55m ago |
-| `shark10-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache,shark10-ci`, `Linux,X64,rdna3,shark10-ci`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 610 | 570 | 38 | 2 | 6% |  | 19h56m ago |
-| `iree-mi308-1` | `nodai-amdgpu-mi308-x86-64` | 237 | 225 | 5 | 7 | 2% |  | 20h16m ago |
-| `shark10-ci-2` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache,shark10-ci`, `Linux,X64,rdna3,shark10-ci`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 64 | 56 | 7 | 1 | 11% |  | 5d03h ago |
+| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64` | 799 | 784 | 11 | 4 | 1% |  | 1d01h ago |
+| `shark10-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache,shark10-ci`, `Linux,X64,rdna3,shark10-ci`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 610 | 570 | 38 | 2 | 6% |  | 1d01h ago |
+| `iree-mi308-1` | `nodai-amdgpu-mi308-x86-64` | 237 | 225 | 5 | 7 | 2% |  | 1d02h ago |
+| `shark10-ci-2` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache,shark10-ci`, `Linux,X64,rdna3,shark10-ci`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 64 | 56 | 7 | 1 | 11% |  | 5d09h ago |
 
 ## Alerts
 
