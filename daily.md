@@ -1,6 +1,6 @@
 # Daily report — 2026-05-04 (Monday)
 
-_Updated: 2026-05-05 11:50 PDT_ — `iree-org/iree`, covering `2026-05-04 00:00 PDT` → `2026-05-05 00:00 PDT` (Pacific calendar day **2026-05-04 (Monday)**)
+_Updated: 2026-05-05 18:08 PDT_ — `iree-org/iree`, covering `2026-05-04 00:00 PDT` → `2026-05-05 00:00 PDT` (Pacific calendar day **2026-05-04 (Monday)**)
 
 Snapshot of the most recently completed Pacific calendar day. Larger window than the rolling [`status.md`](status.md) — better percentile stability and small-volume labels can reach the failure-rate threshold. Refreshed each tick; content only changes when crossing midnight Pacific time, so most ticks produce no diff.
 
@@ -9,7 +9,7 @@ Snapshot of the most recently completed Pacific calendar day. Larger window than
 | label | type | jobs | completed | p50 queue | p95 queue | max queue | all-jobs fail | main-only fail | runners | SPOF |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|:---:|
 | `Linux,X64,gfx1201` | self-hosted | 88 | 88 | [22m44s](https://github.com/iree-org/iree/actions/runs/25346316029/job/74317075276) | [3h24m](https://github.com/iree-org/iree/actions/runs/25337547711/job/74290790842) | [4h53m](https://github.com/iree-org/iree/actions/runs/25331363304/job/74267052194) | 1% (1/88) | 0% (0/18) | 1 | yes |
-| `Linux,X64,rdna3,persistent-cache,shark10-ci` | self-hosted | 44 | 44 | [25m30s](https://github.com/iree-org/iree/actions/runs/25346316029/job/74317075221) | [2h32m](https://github.com/iree-org/iree/actions/runs/25332338190/job/74270444893) | [2h46m](https://github.com/iree-org/iree/actions/runs/25329744694/job/74261550998) | 0% (0/44) | 0% (0/9) | 1 |  |
+| `Linux,X64,rdna3,persistent-cache,shark10-ci` | self-hosted | 44 | 44 | [25m30s](https://github.com/iree-org/iree/actions/runs/25346316029/job/74317075221) | [2h32m](https://github.com/iree-org/iree/actions/runs/25332338190/job/74270444893) | [2h46m](https://github.com/iree-org/iree/actions/runs/25329744694/job/74261550998) | 0% (0/44) | 0% (0/9) | 1 | yes |
 | `Linux,X64,rdna3,shark10-ci` | self-hosted | 44 | 44 | [30m14s](https://github.com/iree-org/iree/actions/runs/25346257007/job/74316744188) | [2h13m](https://github.com/iree-org/iree/actions/runs/25341534382/job/74301140989) | [3h21m](https://github.com/iree-org/iree/actions/runs/25329744694/job/74261551089) | 14% (6/44) | 0% (0/9) | 1 | yes |
 | `Linux,X64,gfx1201,persistent-cache` | self-hosted | 44 | 44 | [11m51s](https://github.com/iree-org/iree/actions/runs/25337116013/job/74286177523) | [2h02m](https://github.com/iree-org/iree/actions/runs/25342702473/job/74305161219) | [2h20m](https://github.com/iree-org/iree/actions/runs/25341108785/job/74299507027) | 0% (0/44) | 0% (0/9) | 1 | yes |
 | `Linux,X64,iree-r9700` | self-hosted | 44 | 44 | [10m26s](https://github.com/iree-org/iree/actions/runs/25339888327/job/74295395491) | [1h38m](https://github.com/iree-org/iree/actions/runs/25340435516/job/74297304630) | [2h50m](https://github.com/iree-org/iree/actions/runs/25341534382/job/74301140692) | 0% (0/44) | 0% (0/9) | 1 | yes |
