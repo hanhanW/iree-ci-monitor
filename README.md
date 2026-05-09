@@ -1,6 +1,6 @@
 # iree-ci-monitor
 
-_Updated: 2026-05-09 05:38 PDT_ — `iree-org/iree`, last 10h
+_Updated: 2026-05-09 11:37 PDT_ — `iree-org/iree`, last 10h
 
 Automated tracker of GitHub Actions runner health for the IREE project. 
 Each tick, the collector pulls new run+job metadata via the GitHub REST API and the reporter regenerates this page.
@@ -17,20 +17,20 @@ Each tick, the collector pulls new run+job metadata via the GitHub REST API and 
 | `Linux,X64,gfx1201,persistent-cache` | self-hosted | 1 | 0 | — | 0 | [9m31s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661939) | [9m31s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661939) | — | `shark75-ci` |
 | `Linux,X64,rdna3,persistent-cache,shark10-ci` | self-hosted | 1 | 0 | — | 0 | [4m39s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661920) | [4m39s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661920) | — | `shark10-ci` |
 | `Linux,X64,rdna3` | self-hosted | 1 | 0 | — | 0 | [4m08s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661938) | [4m08s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661938) | — | `shark55-ci` |
-| `azure-linux-scale` | ossci | 15 | 0 | — | 0 | [12s](https://github.com/iree-org/iree/actions/runs/25598787767/job/75149272423) | [2m06s](https://github.com/iree-org/iree/actions/runs/25598663277/job/75148861177) | — | 13 |
-| `ubuntu-24.04` | github-hosted | 61 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661910) | [8s](https://github.com/iree-org/iree/actions/runs/25598787767/job/75149272362) | 67% (4/6) | 61 |
+| `azure-linux-scale` | ossci | 20 | 0 | — | 3 | [18s](https://github.com/iree-org/iree/actions/runs/25608596570/job/75174720608) | [2m06s](https://github.com/iree-org/iree/actions/runs/25598663277/job/75148861177) | — | 18 |
+| `ubuntu-24.04` | github-hosted | 52 | 0 | — | 1 | [2s](https://github.com/iree-org/iree/actions/runs/25599983214/job/75152159749) | [8s](https://github.com/iree-org/iree/actions/runs/25598787775/job/75149174192) | 0% (0/1) | 52 |
 | `linux-mi325-1gpu-ossci-iree-org` | ossci | 4 | 0 | — | 0 | [8s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661884) | [8s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661937) | — | 4 |
-| `ubuntu-latest` | github-hosted | 7 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25600094239/job/75152440631) | [7s](https://github.com/iree-org/iree/actions/runs/25599992250/job/75152184401) | — | 7 |
-| `ubuntu-24.04-arm` | github-hosted | 12 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598663269/job/75148958680) | [3s](https://github.com/iree-org/iree/actions/runs/25598663269/job/75148958704) | — | 12 |
-| `windows-2022` | github-hosted | 11 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598663269/job/75148958681) | [3s](https://github.com/iree-org/iree/actions/runs/25598663269/job/75148958711) | — | 11 |
-| `macos-14` | github-hosted | 11 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598663269/job/75148958724) | [3s](https://github.com/iree-org/iree/actions/runs/25598787767/job/75149272334) | — | 11 |
+| `ubuntu-latest` | github-hosted | 14 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25603481376/job/75161281290) | [7s](https://github.com/iree-org/iree/actions/runs/25599992250/job/75152184401) | — | 14 |
+| `ubuntu-24.04-arm` | github-hosted | 12 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598787767/job/75149272366) | [3s](https://github.com/iree-org/iree/actions/runs/25598663269/job/75148958704) | — | 12 |
+| `macos-14` | github-hosted | 12 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598787767/job/75149272392) | [3s](https://github.com/iree-org/iree/actions/runs/25598663269/job/75148958674) | — | 12 |
 | `Linux,X64,iree-r9700` | self-hosted | 1 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661858) | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661858) | — | `shark75-ci` |
 | `Linux,X64,iree-w7900` | self-hosted | 1 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661870) | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661870) | — | `shark10-ci` |
 | `Linux,X64,iree-w7900x2,persistent-cache` | self-hosted | 1 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661885) | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661885) | — | `shark01-ci` |
 | `Linux,X64,gfx1100,persistent-cache` | self-hosted | 1 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661909) | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661909) | — | `shark55-ci` |
 | `nodai-amdgpu-mi308-x86-64` | self-hosted | 1 | 0 | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661928) | [2s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661928) | — | `iree-mi308-1` |
+| `windows-2022` | github-hosted | 12 | 0 | — | 3 | [2s](https://github.com/iree-org/iree/actions/runs/25598787767/job/75149272373) | [2s](https://github.com/iree-org/iree/actions/runs/25608596570/job/75174720593) | — | 12 |
 | `linux-mi35x-1gpu-ossci-iree-org` | ossci | 1 | 0 | — | 0 | [1s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661809) | [1s](https://github.com/iree-org/iree/actions/runs/25598787761/job/75149661809) | — | 1 |
-| `azure-windows-scale` | ossci | 3 | 0 | — | 0 | [1s](https://github.com/iree-org/iree/actions/runs/25598663269/job/75148958789) | [1s](https://github.com/iree-org/iree/actions/runs/25598787767/job/75149272422) | — | 3 |
+| `azure-windows-scale` | ossci | 4 | 0 | — | 1 | [1s](https://github.com/iree-org/iree/actions/runs/25598787767/job/75149272422) | [1s](https://github.com/iree-org/iree/actions/runs/25608596570/job/75174720670) | — | 4 |
 
 ## Self-hosted runners (last 7d)
 
