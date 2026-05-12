@@ -49,6 +49,25 @@ class WorkflowQueueAggregationTest(unittest.TestCase):
                         "created_at": "2026-04-24T19:00:00Z",
                         "started_at": "2026-04-24T19:00:00Z",
                         "completed_at": None,
+                        "collected_at": "2026-04-24T20:00:00Z",
+                    },
+                    {
+                        "run_id": 1,
+                        "run_attempt": 1,
+                        "job_id": 10,
+                        "workflow_id": 671,
+                        "workflow_name": "PkgCI",
+                        "workflow_path": ".github/workflows/pkgci_test_torch.yml",
+                        "name": "Test Torch / test_torch_ops :: amdgpu_vulkan_O3",
+                        "labels": ["Linux", "X64", "rdna3", "shark10-ci"],
+                        "status": "queued",
+                        "conclusion": None,
+                        "event": "pull_request",
+                        "head_branch": "pr-branch",
+                        "created_at": "2026-04-24T19:00:00Z",
+                        "started_at": "2026-04-24T19:00:00Z",
+                        "completed_at": None,
+                        "collected_at": "2026-04-24T20:30:00Z",
                     },
                     {
                         "run_id": 4,
@@ -66,6 +85,7 @@ class WorkflowQueueAggregationTest(unittest.TestCase):
                         "created_at": "2026-04-24T09:00:00Z",
                         "started_at": "2026-04-24T09:00:00Z",
                         "completed_at": None,
+                        "collected_at": "2026-04-24T21:00:00Z",
                     },
                     {
                         "run_id": 2,
@@ -83,6 +103,42 @@ class WorkflowQueueAggregationTest(unittest.TestCase):
                         "created_at": "2026-04-24T18:00:00Z",
                         "started_at": "2026-04-24T20:30:00Z",
                         "completed_at": "2026-04-24T20:45:00Z",
+                    },
+                    {
+                        "run_id": 6,
+                        "run_attempt": 1,
+                        "job_id": 60,
+                        "workflow_id": 671,
+                        "workflow_name": "PkgCI",
+                        "workflow_path": ".github/workflows/pkgci_test_torch.yml",
+                        "name": "Test Torch / test_torch_ops :: amdgpu_vulkan_O3",
+                        "labels": ["Linux", "X64", "rdna3", "shark10-ci"],
+                        "status": "queued",
+                        "conclusion": None,
+                        "event": "pull_request",
+                        "head_branch": "finished-pr",
+                        "created_at": "2026-04-24T18:15:00Z",
+                        "started_at": "2026-04-24T18:15:00Z",
+                        "completed_at": None,
+                        "collected_at": "2026-04-24T19:00:00Z",
+                    },
+                    {
+                        "run_id": 6,
+                        "run_attempt": 1,
+                        "job_id": 60,
+                        "workflow_id": 671,
+                        "workflow_name": "PkgCI",
+                        "workflow_path": ".github/workflows/pkgci_test_torch.yml",
+                        "name": "Test Torch / test_torch_ops :: amdgpu_vulkan_O3",
+                        "labels": ["Linux", "X64", "rdna3", "shark10-ci"],
+                        "runner_name": "shark10-ci-2",
+                        "status": "completed",
+                        "conclusion": "success",
+                        "event": "pull_request",
+                        "head_branch": "finished-pr",
+                        "created_at": "2026-04-24T18:15:00Z",
+                        "started_at": "2026-04-24T19:15:00Z",
+                        "completed_at": "2026-04-24T19:30:00Z",
                     },
                     {
                         "run_id": 5,
@@ -136,25 +192,42 @@ class WorkflowQueueAggregationTest(unittest.TestCase):
                 ]
 
                 self.assertEqual(pinned.workflow, ".github/workflows/pkgci_test_torch.yml")
-                self.assertEqual(pinned.total, 4)
+                self.assertEqual(pinned.total, 5)
                 self.assertEqual(pinned.queued, 2)
-                self.assertEqual(pinned.completed, 2)
+                self.assertEqual(pinned.completed, 3)
                 self.assertEqual(pinned.oldest_queued_s, 43200)
-                self.assertEqual(pinned.p50, 9000)
+                self.assertEqual(
+                    pinned.oldest_queued_seen_at,
+                    datetime(2026, 4, 24, 21, 0, tzinfo=timezone.utc),
+                )
+                self.assertEqual(pinned.p50, 3600)
                 self.assertEqual(pinned.p95, 9000)
                 self.assertEqual(pinned.runners, {"shark10-ci-2"})
 
                 label_stats = report.aggregate(now, 10)["Linux,X64,rdna3,shark10-ci"]
-                self.assertEqual(label_stats.total, 4)
+                self.assertEqual(label_stats.total, 5)
                 self.assertEqual(label_stats.queued, 2)
                 self.assertEqual(label_stats.oldest_queued_s, 43200)
-                self.assertEqual(label_stats.p50, 9000)
+                self.assertEqual(
+                    label_stats.oldest_queued_seen_at,
+                    datetime(2026, 4, 24, 21, 0, tzinfo=timezone.utc),
+                )
+                self.assertEqual(label_stats.p50, 3600)
 
                 live_queue = report.queued_jobs(now, report.LIVE_STATE_LOOKBACK_DAYS)
                 self.assertEqual(len(live_queue), 2)
                 self.assertEqual(live_queue[0].labels, "Linux,X64,rdna3,shark10-ci")
                 self.assertEqual(live_queue[0].wait_s, 43200)
+                self.assertEqual(
+                    live_queue[0].observed_at,
+                    datetime(2026, 4, 24, 21, 0, tzinfo=timezone.utc),
+                )
                 self.assertEqual(live_queue[0].workflow, ".github/workflows/pkgci_test_torch.yml")
+                self.assertEqual(live_queue[1].wait_s, 5400)
+                self.assertEqual(
+                    live_queue[1].observed_at,
+                    datetime(2026, 4, 24, 20, 30, tzinfo=timezone.utc),
+                )
             finally:
                 report.DATA_DIR = old_data_dir
 

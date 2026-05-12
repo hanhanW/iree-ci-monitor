@@ -184,6 +184,11 @@ def existing_keys_for_day(path: Path) -> set[tuple[int, int, str]]:
     state change appends zero lines. Without status in the key, the first
     snapshot (often queued) would lock the record forever — making the reader
     believe a long-completed job is still queued.
+
+    Live queued/waiting snapshots are intentionally excluded from this set.
+    They need to be re-appended on every collection tick with a fresh
+    `collected_at` timestamp; otherwise the reporter can only guess how stale a
+    still-queued observation is.
     """
     keys: set[tuple[int, int, str]] = set()
     if not path.exists():
@@ -202,6 +207,8 @@ def existing_keys_for_day(path: Path) -> set[tuple[int, int, str]]:
                 int(obj.get("run_attempt", 1)),
                 str(obj.get("status", "")),
             )
+            if k[2] in ("queued", "waiting"):
+                continue
             keys.add(k)
     return keys
 
@@ -227,7 +234,11 @@ def day_bucket(ts: str | None, fallback: datetime) -> datetime:
     return dt.astimezone(timezone.utc)
 
 
-def normalize_job(job: dict, run: dict) -> dict:
+def fmt_iso(dt: datetime) -> str:
+    return dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def normalize_job(job: dict, run: dict, collected_at: datetime) -> dict:
     return {
         "run_id": int(job["run_id"]),
         "run_attempt": int(job.get("run_attempt", 1)),
@@ -245,6 +256,7 @@ def normalize_job(job: dict, run: dict) -> dict:
         "created_at": job.get("created_at"),
         "started_at": job.get("started_at"),
         "completed_at": job.get("completed_at"),
+        "collected_at": fmt_iso(collected_at),
     }
 
 
@@ -297,7 +309,7 @@ def collect() -> None:
         )
         fallback_dt = parse_iso(run.get("created_at")) or now
         for job in jobs:
-            rec = normalize_job(job, run)
+            rec = normalize_job(job, run, now)
             bucket = day_bucket(rec["created_at"], fallback_dt)
             path = jsonl_path_for(bucket)
             by_day.setdefault(path, []).append(rec)
@@ -318,7 +330,8 @@ def collect() -> None:
         existing = existing_keys_for_day(path)
         fresh = [
             r for r in recs
-            if (r["job_id"], r["run_attempt"], r.get("status", "")) not in existing
+            if r.get("status") in ("queued", "waiting")
+            or (r["job_id"], r["run_attempt"], r.get("status", "")) not in existing
         ]
         append_jsonl(path, fresh)
         total_new += len(fresh)

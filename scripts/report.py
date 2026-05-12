@@ -61,6 +61,7 @@ class LabelStats:
     qtimes: list[tuple[float, int, int]] = field(default_factory=list)  # (qsec, run_id, job_id)
     oldest_queued_s: float = 0.0
     oldest_queued_ref: tuple[int, int] | None = None  # (run_id, job_id)
+    oldest_queued_seen_at: datetime | None = None
     oldest_in_progress_s: float = 0.0
     oldest_in_progress_ref: tuple[int, int] | None = None
     runners: set = field(default_factory=set)
@@ -146,6 +147,7 @@ class WorkflowJobStats:
     qtimes: list[tuple[float, int, int]] = field(default_factory=list)
     oldest_queued_s: float = 0.0
     oldest_queued_ref: tuple[int, int] | None = None
+    oldest_queued_seen_at: datetime | None = None
     runners: set = field(default_factory=set)
 
     def _pct_entry(self, p: int) -> tuple[float, tuple[int, int] | None]:
@@ -194,6 +196,7 @@ class QueuedJob:
     labels: str
     branch: str
     event: str
+    observed_at: datetime | None
 
 
 def md_text(s: str) -> str:
@@ -238,6 +241,12 @@ def fmt_when(now: datetime, ts: datetime | None) -> str:
     if delta < 0:
         delta = 0
     return f"{fmt_duration(delta)} ago"
+
+
+def fmt_seen(now: datetime, ts: datetime | None) -> str:
+    if ts is None:
+        return "unknown"
+    return fmt_when(now, ts)
 
 
 def fmt_updated(now: datetime) -> str:
@@ -373,6 +382,23 @@ def queue_seconds(rec: dict) -> float | None:
     return q if q >= 0 else None
 
 
+def queued_observation(rec: dict) -> tuple[float, datetime | None] | None:
+    """Return queued duration at the time the snapshot was collected.
+
+    For legacy records without `collected_at`, fall back to `created_at`. That
+    is intentionally conservative: it avoids manufacturing live wait time from
+    a stale queued snapshot.
+    """
+    if rec.get("status") not in ("queued", "waiting"):
+        return None
+    created = parse_iso(rec.get("created_at"))
+    if created is None:
+        return None
+    observed = parse_iso(rec.get("collected_at")) or created
+    wait = max(0.0, (observed - created).total_seconds())
+    return wait, observed
+
+
 def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
     cutoff = now - timedelta(hours=window_hours)
     by_label: dict[str, LabelStats] = {}
@@ -406,10 +432,11 @@ def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
                     s.main_cancelled += 1
         elif status == "queued" or status == "waiting":
             s.queued += 1
-            wait = max(0.0, (now - created).total_seconds())
+            wait, observed = queued_observation(rec) or (0.0, None)
             if s.oldest_queued_ref is None or wait > s.oldest_queued_s:
                 s.oldest_queued_s = wait
                 s.oldest_queued_ref = (int(rec["run_id"]), int(rec["job_id"]))
+                s.oldest_queued_seen_at = observed
         elif status == "in_progress":
             s.in_progress += 1
             wait = max(0.0, (now - created).total_seconds())
@@ -440,10 +467,11 @@ def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
         s = by_label.setdefault(key, LabelStats(label=key))
         s.total += 1
         s.queued += 1
-        wait = max(0.0, (now - created).total_seconds())
+        wait, observed = queued_observation(rec) or (0.0, None)
         if s.oldest_queued_ref is None or wait > s.oldest_queued_s:
             s.oldest_queued_s = wait
             s.oldest_queued_ref = (int(rec["run_id"]), int(rec["job_id"]))
+            s.oldest_queued_seen_at = observed
 
     return by_label
 
@@ -476,10 +504,11 @@ def _record_workflow_job(
         s.completed += 1
     elif status == "queued" or status == "waiting":
         s.queued += 1
-        wait = max(0.0, (now - created).total_seconds())
+        wait, observed = queued_observation(rec) or (0.0, None)
         if s.oldest_queued_ref is None or wait > s.oldest_queued_s:
             s.oldest_queued_s = wait
             s.oldest_queued_ref = (int(rec["run_id"]), int(rec["job_id"]))
+            s.oldest_queued_seen_at = observed
     elif status == "in_progress":
         s.in_progress += 1
 
@@ -533,10 +562,14 @@ def queued_jobs(now: datetime, lookback_days: int) -> list[QueuedJob]:
             continue
         if rec.get("status") not in ("queued", "waiting"):
             continue
+        observation = queued_observation(rec)
+        if observation is None:
+            continue
+        wait, observed = observation
         labels = rec.get("labels") or []
         jobs.append(
             QueuedJob(
-                wait_s=max(0.0, (now - created).total_seconds()),
+                wait_s=wait,
                 run_id=int(rec["run_id"]),
                 job_id=int(rec["job_id"]),
                 workflow=workflow_label(rec),
@@ -544,6 +577,7 @@ def queued_jobs(now: datetime, lookback_days: int) -> list[QueuedJob]:
                 labels=",".join(labels) if labels else "—",
                 branch=rec.get("head_branch") or "—",
                 event=rec.get("event") or "—",
+                observed_at=observed,
             )
         )
     return sorted(jobs, key=lambda j: -j.wait_s)
@@ -653,7 +687,7 @@ def build_alerts(stats: dict[str, LabelStats], spof: set[str]) -> list[tuple[str
         if s.p95 > P95_QUEUE_ALERT_S:
             alerts.append(("queue-starved", f"`{s.label}` p95 queue {fmt_duration(s.p95)} (> {fmt_duration(P95_QUEUE_ALERT_S)})"))
         if s.oldest_queued_s > STALE_PENDING_S:
-            alerts.append(("stale-queued", f"`{s.label}` oldest queued job waiting {fmt_duration(s.oldest_queued_s)} (> {fmt_duration(STALE_PENDING_S)})"))
+            alerts.append(("stale-queued", f"`{s.label}` oldest queued job observed waiting {fmt_duration(s.oldest_queued_s)} (> {fmt_duration(STALE_PENDING_S)})"))
         fr = s.main_fail_rate
         main_completed = s.main_ok + s.main_fail + s.main_cancelled
         if fr is not None and fr > HIGH_FAILURE_RATE and main_completed >= HIGH_FAILURE_MIN_N:
@@ -708,7 +742,7 @@ def render_readme(
     lines.append("")
     lines.append(
         f"_Updated: {fmt_updated(now)}_ — `iree-org/iree`, "
-        f"queue samples last {WINDOW_HOURS}h; live queued up to {LIVE_STATE_LOOKBACK_DAYS}d"
+        f"queue samples last {WINDOW_HOURS}h; queued observations up to {LIVE_STATE_LOOKBACK_DAYS}d"
     )
     lines.append("")
     lines.append("Automated tracker of GitHub Actions runner health for the IREE project. ")
@@ -717,8 +751,8 @@ def render_readme(
 
     lines.append(f"## Top of queue (sorted by p95, last {WINDOW_HOURS}h)")
     lines.append("")
-    lines.append("| label | type | jobs | queued | oldest queued | running | p50 queue | p95 queue | main fail rate | runners |")
-    lines.append("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|")
+    lines.append("| label | type | jobs | queued | oldest queued | seen | running | p50 queue | p95 queue | main fail rate | runners |")
+    lines.append("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
     for s in sorted(stats.values(), key=lambda s: -s.p95):
         fr = s.main_fail_rate
         fr_s = f"{fr:.0%} ({s.main_fail}/{s.main_ok + s.main_fail + s.main_cancelled})" if fr is not None else "—"
@@ -729,6 +763,7 @@ def render_readme(
         lines.append(
             f"| `{s.label}` | {classify_label(s.label)} | {s.total} | {s.queued} | "
             f"{fmt_oldest(s.oldest_queued_s, s.oldest_queued_ref) if s.queued else '—'} | "
+            f"{fmt_seen(now, s.oldest_queued_seen_at) if s.queued else '—'} | "
             f"{s.in_progress} | "
             f"{fmt_oldest(s.p50, s.p50_ref)} | {fmt_oldest(s.p95, s.p95_ref)} | "
             f"{fr_s} | {runners_s} |"
@@ -736,17 +771,18 @@ def render_readme(
     lines.append("")
 
     lines.append(
-        f"## Longest queued jobs (live, last {LIVE_STATE_LOOKBACK_DAYS}d)"
+        f"## Longest observed queued jobs (last {LIVE_STATE_LOOKBACK_DAYS}d)"
     )
     lines.append("")
     if not live_queue:
         lines.append("_No queued jobs observed._")
     else:
-        lines.append("| wait | workflow | job | labels | branch | event |")
-        lines.append("|---:|---|---|---|---|---|")
+        lines.append("| wait | observed | workflow | job | labels | branch | event |")
+        lines.append("|---:|---:|---|---|---|---|---|")
         for q in live_queue[:15]:
             lines.append(
                 f"| {fmt_oldest(q.wait_s, (q.run_id, q.job_id))} | "
+                f"{fmt_seen(now, q.observed_at)} | "
                 f"{fmt_code(q.workflow)} | {md_text(q.job)} | {fmt_code(q.labels)} | "
                 f"{fmt_code(q.branch)} | {q.event} |"
             )
@@ -754,14 +790,14 @@ def render_readme(
 
     lines.append(
         f"## Workflow/job waiting time (samples last {WINDOW_HOURS}h, "
-        f"live queued up to {LIVE_STATE_LOOKBACK_DAYS}d)"
+        f"queued observations up to {LIVE_STATE_LOOKBACK_DAYS}d)"
     )
     lines.append("")
     lines.append(
-        "| workflow | job | labels | jobs | queued | oldest queued | "
+        "| workflow | job | labels | jobs | queued | oldest queued | seen | "
         "p50 queue | p95 queue | max queue | runners |"
     )
-    lines.append("|---|---|---|---:|---:|---:|---:|---:|---:|---:|")
+    lines.append("|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|")
     for w in sorted(workflow_jobs.values(), key=_workflow_job_sort_key)[:20]:
         max_q, max_ref = w.max_entry
         lines.append(
@@ -769,6 +805,7 @@ def render_readme(
             f"{w.total} | "
             f"{w.queued} | "
             f"{fmt_oldest(w.oldest_queued_s, w.oldest_queued_ref) if w.queued else '—'} | "
+            f"{fmt_seen(now, w.oldest_queued_seen_at) if w.queued else '—'} | "
             f"{fmt_oldest(w.p50, w.p50_ref)} | {fmt_oldest(w.p95, w.p95_ref)} | "
             f"{fmt_oldest(max_q, max_ref)} | {len(w.runners)} |"
         )
@@ -831,14 +868,14 @@ def render_status(
     lines.append(
         f"_Updated: {fmt_updated(now)}_ — watching `iree-org/iree`, "
         f"queue samples = last {WINDOW_HOURS}h, "
-        f"live queued = up to {LIVE_STATE_LOOKBACK_DAYS}d"
+        f"queued observations = up to {LIVE_STATE_LOOKBACK_DAYS}d"
     )
     lines.append("")
 
     lines.append("## Per-label metrics")
     lines.append("")
-    lines.append("| label | type | jobs | queued | oldest queued | running | oldest running | avg | p50 | p95 | max | all-jobs fail | main-only fail | runners | SPOF |")
-    lines.append("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|")
+    lines.append("| label | type | jobs | queued | oldest queued | seen | running | oldest running | avg | p50 | p95 | max | all-jobs fail | main-only fail | runners | SPOF |")
+    lines.append("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|")
     for s in sorted(stats.values(), key=lambda s: -s.p95):
         fr_all = s.all_fail_rate
         fr_main = s.main_fail_rate
@@ -858,6 +895,7 @@ def render_status(
         lines.append(
             f"| `{s.label}` | {classify_label(s.label)} | {s.total} | {s.queued} | "
             f"{fmt_oldest(s.oldest_queued_s, s.oldest_queued_ref) if s.queued else '—'} | "
+            f"{fmt_seen(now, s.oldest_queued_seen_at) if s.queued else '—'} | "
             f"{s.in_progress} | "
             f"{fmt_oldest(s.oldest_in_progress_s, s.oldest_in_progress_ref) if s.in_progress else '—'} | "
             f"{fmt_duration(s.avg)} | {fmt_oldest(s.p50, s.p50_ref)} | {fmt_oldest(s.p95, s.p95_ref)} | "
@@ -867,17 +905,18 @@ def render_status(
     lines.append("")
 
     lines.append(
-        f"## Longest queued jobs (live, last {LIVE_STATE_LOOKBACK_DAYS}d)"
+        f"## Longest observed queued jobs (last {LIVE_STATE_LOOKBACK_DAYS}d)"
     )
     lines.append("")
     if not live_queue:
         lines.append("_No queued jobs observed._")
     else:
-        lines.append("| wait | workflow | job | labels | branch | event |")
-        lines.append("|---:|---|---|---|---|---|")
+        lines.append("| wait | observed | workflow | job | labels | branch | event |")
+        lines.append("|---:|---:|---|---|---|---|---|")
         for q in live_queue:
             lines.append(
                 f"| {fmt_oldest(q.wait_s, (q.run_id, q.job_id))} | "
+                f"{fmt_seen(now, q.observed_at)} | "
                 f"{fmt_code(q.workflow)} | {md_text(q.job)} | {fmt_code(q.labels)} | "
                 f"{fmt_code(q.branch)} | {q.event} |"
             )
@@ -891,16 +930,17 @@ def render_status(
     )
     lines.append("")
     lines.append(
-        "| workflow | job | labels | type | jobs | queued | oldest queued | "
+        "| workflow | job | labels | type | jobs | queued | oldest queued | seen | "
         "running | avg | p50 | p95 | max | runners |"
     )
-    lines.append("|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
+    lines.append("|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
     for w in sorted(workflow_jobs.values(), key=_workflow_job_sort_key):
         max_q, max_ref = w.max_entry
         lines.append(
             f"| {fmt_code(w.workflow)} | {md_text(w.job)} | {fmt_code(w.labels)} | "
             f"{classify_label(w.labels)} | {w.total} | {w.queued} | "
             f"{fmt_oldest(w.oldest_queued_s, w.oldest_queued_ref) if w.queued else '—'} | "
+            f"{fmt_seen(now, w.oldest_queued_seen_at) if w.queued else '—'} | "
             f"{w.in_progress} | {fmt_duration(w.avg)} | "
             f"{fmt_oldest(w.p50, w.p50_ref)} | {fmt_oldest(w.p95, w.p95_ref)} | "
             f"{fmt_oldest(max_q, max_ref)} | {len(w.runners)} |"
@@ -949,7 +989,7 @@ def render_status(
     lines.append("")
     lines.append(
         f"- Window: last {WINDOW_HOURS} hours of job records for queue-time "
-        f"percentiles and failure metrics; live queued jobs are scanned for "
+        f"percentiles and failure metrics; queued observations are scanned for "
         f"{LIVE_STATE_LOOKBACK_DAYS} days; last {RUNNER_LOOKBACK_DAYS} days for "
         "runner metrics and SPOF."
     )
@@ -957,7 +997,7 @@ def render_status(
     lines.append("- Queue time: `started_at - created_at`. Skipped jobs excluded.")
     lines.append("- Queued: jobs with `status == queued` or `waiting` (not yet assigned a runner).")
     lines.append("- Running: jobs with `status == in_progress` (runner assigned, executing).")
-    lines.append("- Oldest queued: `now - created_at` for the oldest still-queued job. This is the actionable signal for runner starvation — a job that's been in_progress for hours is just slow, not starved.")
+    lines.append("- Oldest queued: `collected_at - created_at` for the oldest job observed with `status == queued` or `waiting`. This is only updated by collection; rerunning the reporter does not inflate stale queued snapshots.")
     lines.append(
         "- Workflow/job waiting time: same queue-time definition, grouped by "
         "stable workflow id/name + job name + exact label set. Older records collected "
@@ -977,7 +1017,7 @@ def render_status(
     lines.append("## Alert thresholds")
     lines.append("")
     lines.append(f"- `queue-starved`: p95 queue > {fmt_duration(P95_QUEUE_ALERT_S)}")
-    lines.append(f"- `stale-queued`: oldest queued job (not yet started) > {fmt_duration(STALE_PENDING_S)}")
+    lines.append(f"- `stale-queued`: oldest observed queued job (not yet started) > {fmt_duration(STALE_PENDING_S)}")
     lines.append(f"- `high-failure-main`: main-only failure rate > {HIGH_FAILURE_RATE:.0%} with ≥ {HIGH_FAILURE_MIN_N} completed main-only jobs")
     lines.append(f"- `spof`: only one distinct runner in last {SPOF_LOOKBACK_DAYS}d")
     lines.append("")
