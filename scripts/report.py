@@ -26,6 +26,7 @@ STATUS_PATH = ROOT / "status.md"
 DAILY_PATH = ROOT / "daily.md"
 
 WINDOW_HOURS = 10
+LIVE_STATE_LOOKBACK_DAYS = 3
 SPOF_LOOKBACK_DAYS = 7
 RUNNER_LOOKBACK_DAYS = 7
 # Labels with more distinct runners than this over the lookback window are treated
@@ -133,6 +134,77 @@ class RunnerStats:
         return self.fail / self.completed
 
 
+@dataclass
+class WorkflowJobStats:
+    workflow: str
+    job: str
+    labels: str
+    total: int = 0
+    queued: int = 0
+    in_progress: int = 0
+    completed: int = 0
+    qtimes: list[tuple[float, int, int]] = field(default_factory=list)
+    oldest_queued_s: float = 0.0
+    oldest_queued_ref: tuple[int, int] | None = None
+    runners: set = field(default_factory=set)
+
+    def _pct_entry(self, p: int) -> tuple[float, tuple[int, int] | None]:
+        if not self.qtimes:
+            return 0.0, None
+        xs = sorted(self.qtimes)
+        k = max(0, min(len(xs) - 1, int(round((p / 100) * (len(xs) - 1)))))
+        q, run_id, job_id = xs[k]
+        return q, (run_id, job_id)
+
+    @property
+    def p50(self) -> float:
+        return self._pct_entry(50)[0]
+
+    @property
+    def p50_ref(self) -> tuple[int, int] | None:
+        return self._pct_entry(50)[1]
+
+    @property
+    def p95(self) -> float:
+        return self._pct_entry(95)[0]
+
+    @property
+    def p95_ref(self) -> tuple[int, int] | None:
+        return self._pct_entry(95)[1]
+
+    @property
+    def avg(self) -> float:
+        return statistics.mean(q for q, _r, _j in self.qtimes) if self.qtimes else 0.0
+
+    @property
+    def max_entry(self) -> tuple[float, tuple[int, int] | None]:
+        if not self.qtimes:
+            return 0.0, None
+        q, run_id, job_id = max(self.qtimes)
+        return q, (run_id, job_id)
+
+
+@dataclass
+class QueuedJob:
+    wait_s: float
+    run_id: int
+    job_id: int
+    workflow: str
+    job: str
+    labels: str
+    branch: str
+    event: str
+
+
+def md_text(s: str) -> str:
+    return str(s).replace("\n", " ").replace("|", "\\|")
+
+
+def fmt_code(s: str) -> str:
+    escaped = md_text(s).replace("`", "\\`")
+    return f"`{escaped}`"
+
+
 def fmt_oldest(seconds: float, ref: tuple[int, int] | None) -> str:
     """Render a duration linked to the responsible job, if known."""
     txt = fmt_duration(seconds)
@@ -170,6 +242,16 @@ def fmt_when(now: datetime, ts: datetime | None) -> str:
 
 def fmt_updated(now: datetime) -> str:
     return now.astimezone(DISPLAY_TZ).strftime("%Y-%m-%d %H:%M %Z")
+
+
+def parse_now() -> datetime:
+    override = os.environ.get("IREE_CI_MONITOR_NOW")
+    if not override:
+        return datetime.now(timezone.utc)
+    parsed = parse_iso(override)
+    if parsed is None:
+        raise ValueError("IREE_CI_MONITOR_NOW must be an ISO-8601 timestamp")
+    return parsed.astimezone(timezone.utc)
 
 
 def iter_jsonl(path: Path) -> Iterable[dict]:
@@ -256,6 +338,41 @@ def is_main_post_merge(rec: dict) -> bool:
     return rec.get("head_branch") == "main" and rec.get("event") != "pull_request"
 
 
+def workflow_label(rec: dict) -> str:
+    return rec.get("workflow_path") or rec.get("workflow_name") or "unknown"
+
+
+def workflow_key(rec: dict) -> str:
+    workflow_id = rec.get("workflow_id")
+    if workflow_id:
+        return f"id:{workflow_id}"
+    return f"name:{workflow_label(rec)}"
+
+
+def queue_sample_started(rec: dict) -> bool:
+    """Return true if a job has a meaningful queued-to-started duration."""
+    status = rec.get("status")
+    conclusion = rec.get("conclusion")
+    if status not in ("completed", "in_progress") or conclusion == "skipped":
+        return False
+    # Cancelled jobs often never got a runner and GitHub reports
+    # started_at == created_at. Counting those as 0s hides real queue pressure.
+    if conclusion == "cancelled" and not rec.get("runner_name"):
+        return False
+    return True
+
+
+def queue_seconds(rec: dict) -> float | None:
+    if not queue_sample_started(rec):
+        return None
+    created = parse_iso(rec.get("created_at"))
+    started = parse_iso(rec.get("started_at"))
+    if not created or not started:
+        return None
+    q = (started - created).total_seconds()
+    return q if q >= 0 else None
+
+
 def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
     cutoff = now - timedelta(hours=window_hours)
     by_label: dict[str, LabelStats] = {}
@@ -304,17 +421,132 @@ def aggregate(now: datetime, window_hours: int) -> dict[str, LabelStats]:
         if rn:
             s.runners.add(rn)
 
-        # Queue time is only meaningful once the job has actually started.
-        # For `queued` records GitHub returns started_at == created_at which
-        # would contribute spurious 0s to the percentile pool.
-        if status in ("completed", "in_progress") and concl != "skipped":
-            started = parse_iso(rec.get("started_at"))
-            if started and created:
-                q = (started - created).total_seconds()
-                if q >= 0:
-                    s.qtimes.append((q, int(rec["run_id"]), int(rec["job_id"])))
+        q = queue_seconds(rec)
+        if q is not None:
+            s.qtimes.append((q, int(rec["run_id"]), int(rec["job_id"])))
+
+    # Overlay live queued jobs from the collector's open-run horizon. These
+    # must not disappear just because they exceeded the rolling history window.
+    for rec in iter_latest_per_job(files_in_days(now, LIVE_STATE_LOOKBACK_DAYS)):
+        created = parse_iso(rec.get("created_at"))
+        if created is None or created >= cutoff:
+            continue
+        if rec.get("status") not in ("queued", "waiting"):
+            continue
+        labels = rec.get("labels") or []
+        if not labels:
+            continue
+        key = ",".join(labels)
+        s = by_label.setdefault(key, LabelStats(label=key))
+        s.total += 1
+        s.queued += 1
+        wait = max(0.0, (now - created).total_seconds())
+        if s.oldest_queued_ref is None or wait > s.oldest_queued_s:
+            s.oldest_queued_s = wait
+            s.oldest_queued_ref = (int(rec["run_id"]), int(rec["job_id"]))
 
     return by_label
+
+
+def _record_workflow_job(
+    by_workflow_job: dict[tuple[str, str, str], WorkflowJobStats],
+    rec: dict,
+    now: datetime,
+) -> None:
+    created = parse_iso(rec.get("created_at"))
+    if created is None:
+        return
+    labels = rec.get("labels") or []
+    if not labels:
+        return
+    labels_key = ",".join(labels)
+    workflow = workflow_label(rec)
+    job = rec.get("name") or "unknown"
+    key = (workflow_key(rec), job, labels_key)
+    s = by_workflow_job.setdefault(
+        key, WorkflowJobStats(workflow=workflow, job=job, labels=labels_key)
+    )
+    if rec.get("workflow_path"):
+        s.workflow = rec["workflow_path"]
+    s.total += 1
+
+    status = rec.get("status")
+    concl = rec.get("conclusion")
+    if status == "completed":
+        s.completed += 1
+    elif status == "queued" or status == "waiting":
+        s.queued += 1
+        wait = max(0.0, (now - created).total_seconds())
+        if s.oldest_queued_ref is None or wait > s.oldest_queued_s:
+            s.oldest_queued_s = wait
+            s.oldest_queued_ref = (int(rec["run_id"]), int(rec["job_id"]))
+    elif status == "in_progress":
+        s.in_progress += 1
+
+    rn = rec.get("runner_name")
+    if rn:
+        s.runners.add(rn)
+
+    q = queue_seconds(rec)
+    if q is not None:
+        s.qtimes.append((q, int(rec["run_id"]), int(rec["job_id"])))
+
+
+def aggregate_workflow_jobs(
+    now: datetime, window_hours: int
+) -> dict[tuple[str, str, str], WorkflowJobStats]:
+    cutoff = now - timedelta(hours=window_hours)
+    by_workflow_job: dict[tuple[str, str, str], WorkflowJobStats] = {}
+    for rec in iter_latest_per_job(files_in_window(now, window_hours)):
+        created = parse_iso(rec.get("created_at"))
+        if created is None or created < cutoff:
+            continue
+        _record_workflow_job(by_workflow_job, rec, now)
+    for rec in iter_latest_per_job(files_in_days(now, LIVE_STATE_LOOKBACK_DAYS)):
+        created = parse_iso(rec.get("created_at"))
+        if created is None or created >= cutoff:
+            continue
+        if rec.get("status") not in ("queued", "waiting"):
+            continue
+        _record_workflow_job(by_workflow_job, rec, now)
+    return by_workflow_job
+
+
+def aggregate_workflow_jobs_period(
+    start: datetime, end: datetime
+) -> dict[tuple[str, str, str], WorkflowJobStats]:
+    by_workflow_job: dict[tuple[str, str, str], WorkflowJobStats] = {}
+    for rec in iter_latest_per_job(files_in_range(start, end)):
+        created = parse_iso(rec.get("created_at"))
+        if created is None or created < start or created >= end:
+            continue
+        _record_workflow_job(by_workflow_job, rec, end)
+    return by_workflow_job
+
+
+def queued_jobs(now: datetime, lookback_days: int) -> list[QueuedJob]:
+    cutoff = now - timedelta(days=lookback_days)
+    jobs: list[QueuedJob] = []
+    for rec in iter_latest_per_job(files_in_days(now, lookback_days)):
+        created = parse_iso(rec.get("created_at"))
+        if created is None or created < cutoff:
+            continue
+        if rec.get("status") not in ("queued", "waiting"):
+            continue
+        labels = rec.get("labels") or []
+        jobs.append(
+            QueuedJob(
+                wait_s=max(0.0, (now - created).total_seconds()),
+                run_id=int(rec["run_id"]),
+                job_id=int(rec["job_id"]),
+                workflow=workflow_label(rec),
+                job=rec.get("name") or "unknown",
+                labels=",".join(labels) if labels else "—",
+                branch=rec.get("head_branch") or "—",
+                event=rec.get("event") or "—",
+            )
+        )
+    return sorted(jobs, key=lambda j: -j.wait_s)
 
 
 def aggregate_period(start: datetime, end: datetime) -> dict[str, LabelStats]:
@@ -354,12 +586,9 @@ def aggregate_period(start: datetime, end: datetime) -> dict[str, LabelStats]:
         if rn:
             s.runners.add(rn)
 
-        if status in ("completed", "in_progress") and concl != "skipped":
-            started = parse_iso(rec.get("started_at"))
-            if started:
-                q = (started - created).total_seconds()
-                if q >= 0:
-                    s.qtimes.append((q, int(rec["run_id"]), int(rec["job_id"])))
+        q = queue_seconds(rec)
+        if q is not None:
+            s.qtimes.append((q, int(rec["run_id"]), int(rec["job_id"])))
     return by_label
 
 
@@ -442,6 +671,11 @@ def _runner_sort_key(r: RunnerStats):
     return (0 if r.running > 0 else 1, -last.timestamp())
 
 
+def _workflow_job_sort_key(s: WorkflowJobStats):
+    # Surface current starvation first, then historical wait outliers.
+    return (-max(s.oldest_queued_s, s.p95), -s.queued, -s.total, s.workflow, s.job)
+
+
 def classify_label(label: str) -> str:
     """Classify a label as self-hosted, github-hosted, or ossci.
 
@@ -463,6 +697,8 @@ def classify_label(label: str) -> str:
 def render_readme(
     now: datetime,
     stats: dict[str, LabelStats],
+    workflow_jobs: dict[tuple[str, str, str], WorkflowJobStats],
+    live_queue: list[QueuedJob],
     alerts: list[tuple[str, str]],
     runners: dict[str, RunnerStats],
     label_runners: dict[str, set[str]],
@@ -470,7 +706,10 @@ def render_readme(
     lines: list[str] = []
     lines.append("# iree-ci-monitor")
     lines.append("")
-    lines.append(f"_Updated: {fmt_updated(now)}_ — `iree-org/iree`, last {WINDOW_HOURS}h")
+    lines.append(
+        f"_Updated: {fmt_updated(now)}_ — `iree-org/iree`, "
+        f"queue samples last {WINDOW_HOURS}h; live queued up to {LIVE_STATE_LOOKBACK_DAYS}d"
+    )
     lines.append("")
     lines.append("Automated tracker of GitHub Actions runner health for the IREE project. ")
     lines.append("Each tick, the collector pulls new run+job metadata via the GitHub REST API and the reporter regenerates this page.")
@@ -493,6 +732,45 @@ def render_readme(
             f"{s.in_progress} | "
             f"{fmt_oldest(s.p50, s.p50_ref)} | {fmt_oldest(s.p95, s.p95_ref)} | "
             f"{fr_s} | {runners_s} |"
+        )
+    lines.append("")
+
+    lines.append(
+        f"## Longest queued jobs (live, last {LIVE_STATE_LOOKBACK_DAYS}d)"
+    )
+    lines.append("")
+    if not live_queue:
+        lines.append("_No queued jobs observed._")
+    else:
+        lines.append("| wait | workflow | job | labels | branch | event |")
+        lines.append("|---:|---|---|---|---|---|")
+        for q in live_queue[:15]:
+            lines.append(
+                f"| {fmt_oldest(q.wait_s, (q.run_id, q.job_id))} | "
+                f"{fmt_code(q.workflow)} | {md_text(q.job)} | {fmt_code(q.labels)} | "
+                f"{fmt_code(q.branch)} | {q.event} |"
+            )
+    lines.append("")
+
+    lines.append(
+        f"## Workflow/job waiting time (samples last {WINDOW_HOURS}h, "
+        f"live queued up to {LIVE_STATE_LOOKBACK_DAYS}d)"
+    )
+    lines.append("")
+    lines.append(
+        "| workflow | job | labels | jobs | queued | oldest queued | "
+        "p50 queue | p95 queue | max queue | runners |"
+    )
+    lines.append("|---|---|---|---:|---:|---:|---:|---:|---:|---:|")
+    for w in sorted(workflow_jobs.values(), key=_workflow_job_sort_key)[:20]:
+        max_q, max_ref = w.max_entry
+        lines.append(
+            f"| {fmt_code(w.workflow)} | {md_text(w.job)} | {fmt_code(w.labels)} | "
+            f"{w.total} | "
+            f"{w.queued} | "
+            f"{fmt_oldest(w.oldest_queued_s, w.oldest_queued_ref) if w.queued else '—'} | "
+            f"{fmt_oldest(w.p50, w.p50_ref)} | {fmt_oldest(w.p95, w.p95_ref)} | "
+            f"{fmt_oldest(max_q, max_ref)} | {len(w.runners)} |"
         )
     lines.append("")
 
@@ -540,6 +818,8 @@ def render_readme(
 def render_status(
     now: datetime,
     stats: dict[str, LabelStats],
+    workflow_jobs: dict[tuple[str, str, str], WorkflowJobStats],
+    live_queue: list[QueuedJob],
     alerts: list[tuple[str, str]],
     spof: set[str],
     runners: dict[str, RunnerStats],
@@ -548,7 +828,11 @@ def render_status(
     lines: list[str] = []
     lines.append("# Status detail")
     lines.append("")
-    lines.append(f"_Updated: {fmt_updated(now)}_ — watching `iree-org/iree`, window = last {WINDOW_HOURS}h")
+    lines.append(
+        f"_Updated: {fmt_updated(now)}_ — watching `iree-org/iree`, "
+        f"queue samples = last {WINDOW_HOURS}h, "
+        f"live queued = up to {LIVE_STATE_LOOKBACK_DAYS}d"
+    )
     lines.append("")
 
     lines.append("## Per-label metrics")
@@ -579,6 +863,47 @@ def render_status(
             f"{fmt_duration(s.avg)} | {fmt_oldest(s.p50, s.p50_ref)} | {fmt_oldest(s.p95, s.p95_ref)} | "
             f"{fmt_oldest(max_q, max_ref)} | {fr_all_s} | {fr_main_s} | "
             f"{len(s.runners)} | {'yes' if s.label in spof else ''} |"
+        )
+    lines.append("")
+
+    lines.append(
+        f"## Longest queued jobs (live, last {LIVE_STATE_LOOKBACK_DAYS}d)"
+    )
+    lines.append("")
+    if not live_queue:
+        lines.append("_No queued jobs observed._")
+    else:
+        lines.append("| wait | workflow | job | labels | branch | event |")
+        lines.append("|---:|---|---|---|---|---|")
+        for q in live_queue:
+            lines.append(
+                f"| {fmt_oldest(q.wait_s, (q.run_id, q.job_id))} | "
+                f"{fmt_code(q.workflow)} | {md_text(q.job)} | {fmt_code(q.labels)} | "
+                f"{fmt_code(q.branch)} | {q.event} |"
+            )
+    lines.append("")
+
+    lines.append("## Workflow/job waiting time")
+    lines.append("")
+    lines.append(
+        "Aggregated by workflow file/name, job name, and exact `runs-on` label set. "
+        "This exposes cases where one CI job is constrained more tightly than the broader label pool."
+    )
+    lines.append("")
+    lines.append(
+        "| workflow | job | labels | type | jobs | queued | oldest queued | "
+        "running | avg | p50 | p95 | max | runners |"
+    )
+    lines.append("|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
+    for w in sorted(workflow_jobs.values(), key=_workflow_job_sort_key):
+        max_q, max_ref = w.max_entry
+        lines.append(
+            f"| {fmt_code(w.workflow)} | {md_text(w.job)} | {fmt_code(w.labels)} | "
+            f"{classify_label(w.labels)} | {w.total} | {w.queued} | "
+            f"{fmt_oldest(w.oldest_queued_s, w.oldest_queued_ref) if w.queued else '—'} | "
+            f"{w.in_progress} | {fmt_duration(w.avg)} | "
+            f"{fmt_oldest(w.p50, w.p50_ref)} | {fmt_oldest(w.p95, w.p95_ref)} | "
+            f"{fmt_oldest(max_q, max_ref)} | {len(w.runners)} |"
         )
     lines.append("")
 
@@ -622,12 +947,22 @@ def render_status(
 
     lines.append("## Methodology")
     lines.append("")
-    lines.append(f"- Window: last {WINDOW_HOURS} hours of job records for label metrics; last {RUNNER_LOOKBACK_DAYS} days for runner metrics and SPOF.")
+    lines.append(
+        f"- Window: last {WINDOW_HOURS} hours of job records for queue-time "
+        f"percentiles and failure metrics; live queued jobs are scanned for "
+        f"{LIVE_STATE_LOOKBACK_DAYS} days; last {RUNNER_LOOKBACK_DAYS} days for "
+        "runner metrics and SPOF."
+    )
     lines.append(f"- Timestamps rendered in `{DISPLAY_TZ.key}` local time; underlying records are UTC.")
     lines.append("- Queue time: `started_at - created_at`. Skipped jobs excluded.")
     lines.append("- Queued: jobs with `status == queued` or `waiting` (not yet assigned a runner).")
     lines.append("- Running: jobs with `status == in_progress` (runner assigned, executing).")
     lines.append("- Oldest queued: `now - created_at` for the oldest still-queued job. This is the actionable signal for runner starvation — a job that's been in_progress for hours is just slow, not starved.")
+    lines.append(
+        "- Workflow/job waiting time: same queue-time definition, grouped by "
+        "stable workflow id/name + job name + exact label set. Older records collected "
+        "before `workflow_path` was stored fall back to `workflow_name`."
+    )
     lines.append("- All-jobs fail rate: over every completed job (PR + push + schedule).")
     lines.append("- Main-only fail rate: subset where `head_branch == main` and `event != pull_request` — post-merge, scheduled, and workflow_dispatch runs. PR noise excluded.")
     lines.append("- Runner type:")
@@ -652,6 +987,7 @@ def render_status(
 def render_daily(
     now: datetime,
     stats: dict[str, LabelStats],
+    workflow_jobs: dict[tuple[str, str, str], WorkflowJobStats],
     spof: set[str],
     start: datetime,
     end: datetime,
@@ -704,6 +1040,23 @@ def render_daily(
         )
     lines.append("")
 
+    lines.append("## Workflow/job waiting time")
+    lines.append("")
+    lines.append(
+        "| workflow | job | labels | jobs | completed | p50 queue | "
+        "p95 queue | max queue | runners |"
+    )
+    lines.append("|---|---|---|---:|---:|---:|---:|---:|---:|")
+    for w in sorted(workflow_jobs.values(), key=_workflow_job_sort_key)[:40]:
+        max_q, max_ref = w.max_entry
+        lines.append(
+            f"| {fmt_code(w.workflow)} | {md_text(w.job)} | {fmt_code(w.labels)} | "
+            f"{w.total} | {w.completed} | "
+            f"{fmt_oldest(w.p50, w.p50_ref)} | {fmt_oldest(w.p95, w.p95_ref)} | "
+            f"{fmt_oldest(max_q, max_ref)} | {len(w.runners)} |"
+        )
+    lines.append("")
+
     lines.append("## Methodology")
     lines.append("")
     lines.append(
@@ -714,26 +1067,42 @@ def render_daily(
         "- Live state (queued/running counts and oldest-queued/oldest-running ages) is omitted: "
         "this is a historical view, those signals only make sense in the rolling window."
     )
+    lines.append(
+        "- Workflow/job waiting time is grouped by workflow file/name, job name, "
+        "and exact `runs-on` label set."
+    )
     lines.append("- See [`status.md`](status.md) for full methodology, runner table, and alert thresholds.")
     lines.append("")
     return "\n".join(lines)
 
 
 def main() -> None:
-    now = datetime.now(timezone.utc)
+    now = parse_now()
     stats = aggregate(now, WINDOW_HOURS)
+    workflow_jobs = aggregate_workflow_jobs(now, WINDOW_HOURS)
+    live_queue = queued_jobs(now, LIVE_STATE_LOOKBACK_DAYS)
     runners, label_runners = aggregate_runners(now, RUNNER_LOOKBACK_DAYS)
     spof = spof_labels_from(label_runners)
     alerts = build_alerts(stats, spof)
 
     daily_start, daily_end = daily_window_pt(now)
     daily_stats = aggregate_period(daily_start, daily_end)
+    daily_workflow_jobs = aggregate_workflow_jobs_period(daily_start, daily_end)
 
-    README_PATH.write_text(render_readme(now, stats, alerts, runners, label_runners))
-    STATUS_PATH.write_text(render_status(now, stats, alerts, spof, runners, label_runners))
-    DAILY_PATH.write_text(render_daily(now, daily_stats, spof, daily_start, daily_end))
+    README_PATH.write_text(
+        render_readme(now, stats, workflow_jobs, live_queue, alerts, runners, label_runners)
+    )
+    STATUS_PATH.write_text(
+        render_status(
+            now, stats, workflow_jobs, live_queue, alerts, spof, runners, label_runners
+        )
+    )
+    DAILY_PATH.write_text(
+        render_daily(now, daily_stats, daily_workflow_jobs, spof, daily_start, daily_end)
+    )
     print(
         f"[report] labels={len(stats)} alerts={len(alerts)} "
+        f"workflow_jobs={len(workflow_jobs)} queued_jobs={len(live_queue)} "
         f"spof={len(spof)} runners={len(runners)} "
         f"daily_labels={len(daily_stats)}",
         flush=True,

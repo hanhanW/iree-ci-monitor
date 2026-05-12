@@ -234,6 +234,7 @@ def normalize_job(job: dict, run: dict) -> dict:
         "job_id": int(job["id"]),
         "workflow_id": int(run.get("workflow_id", 0)) or None,
         "workflow_name": run.get("name") or job.get("workflow_name"),
+        "workflow_path": run.get("path"),
         "name": job.get("name"),
         "labels": list(job.get("labels") or []),
         "runner_name": job.get("runner_name"),
