@@ -21,6 +21,15 @@ def load_report_module():
     return module
 
 
+class TimestampFormattingTest(unittest.TestCase):
+    def test_seen_time_uses_absolute_pacific_time(self):
+        report = load_report_module()
+        now = datetime(2026, 5, 12, 23, 15, tzinfo=timezone.utc)
+        observed = datetime(2026, 5, 12, 23, 8, 40, tzinfo=timezone.utc)
+
+        self.assertEqual(report.fmt_seen(now, observed), "2026-05-12 16:08 PDT")
+
+
 class WorkflowQueueAggregationTest(unittest.TestCase):
     def test_workflow_job_waits_and_live_queue_use_exact_labels(self):
         report = load_report_module()

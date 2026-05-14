@@ -246,7 +246,7 @@ def fmt_when(now: datetime, ts: datetime | None) -> str:
 def fmt_seen(now: datetime, ts: datetime | None) -> str:
     if ts is None:
         return "unknown"
-    return fmt_when(now, ts)
+    return ts.astimezone(DISPLAY_TZ).strftime("%Y-%m-%d %H:%M %Z")
 
 
 def fmt_updated(now: datetime) -> str:
