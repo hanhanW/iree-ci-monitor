@@ -747,6 +747,11 @@ def render_readme(
     lines.append("")
     lines.append("Automated tracker of GitHub Actions runner health for the IREE project. ")
     lines.append("Each tick, the collector pulls new run+job metadata via the GitHub REST API and the reporter regenerates this page.")
+    lines.append(
+        "The static benchmark dashboard is generated under [`docs/`](docs/) "
+        "from PkgCI benchmark summary artifacts and can be published with "
+        "GitHub Pages."
+    )
     lines.append("")
 
     lines.append(f"## Top of queue (sorted by p95, last {WINDOW_HOURS}h)")
@@ -846,7 +851,8 @@ def render_readme(
 
     lines.append(
         "See [`status.md`](status.md) for the full per-label breakdown including all-jobs failure rates, methodology, and thresholds. "
-        "See [`daily.md`](daily.md) for a snapshot of the most recently completed Pacific calendar day."
+        "See [`daily.md`](daily.md) for a snapshot of the most recently completed Pacific calendar day. "
+        "See [`docs/README.md`](docs/README.md) for dashboard generation, local viewing, and chart interaction notes."
     )
     lines.append("")
     return "\n".join(lines)

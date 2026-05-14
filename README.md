@@ -4,6 +4,7 @@ _Updated: 2026-05-14 11:59 PDT_ — `iree-org/iree`, queue samples last 10h; que
 
 Automated tracker of GitHub Actions runner health for the IREE project. 
 Each tick, the collector pulls new run+job metadata via the GitHub REST API and the reporter regenerates this page.
+The static benchmark dashboard is generated under [`docs/`](docs/) from PkgCI benchmark summary artifacts and can be published with GitHub Pages.
 
 ## Top of queue (sorted by p95, last 10h)
 
@@ -103,4 +104,4 @@ Each tick, the collector pulls new run+job metadata via the GitHub REST API and 
 - **[spof]** `Linux,X64,rdna3,persistent-cache,shark10-ci` single runner observed in last 7d
 - **[spof]** `nodai-amdgpu-mi308-x86-64` single runner observed in last 7d
 
-See [`status.md`](status.md) for the full per-label breakdown including all-jobs failure rates, methodology, and thresholds. See [`daily.md`](daily.md) for a snapshot of the most recently completed Pacific calendar day.
+See [`status.md`](status.md) for the full per-label breakdown including all-jobs failure rates, methodology, and thresholds. See [`daily.md`](daily.md) for a snapshot of the most recently completed Pacific calendar day. See [`docs/README.md`](docs/README.md) for dashboard generation, local viewing, and chart interaction notes.

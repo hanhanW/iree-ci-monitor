@@ -67,6 +67,9 @@ class CollectSnapshotTest(unittest.TestCase):
             "workflow_id": 3,
             "name": "CI",
             "path": ".github/workflows/ci.yml",
+            "html_url": "https://example.test/run/2",
+            "head_sha": "abcdef1234567890",
+            "head_commit": {"message": "Tune SDXL clip dispatch\n\nMore details."},
             "event": "pull_request",
             "head_branch": "branch",
         }
@@ -75,6 +78,9 @@ class CollectSnapshotTest(unittest.TestCase):
 
         self.assertEqual(rec["collected_at"], "2026-05-12T23:01:02Z")
         self.assertEqual(rec["workflow_path"], ".github/workflows/ci.yml")
+        self.assertEqual(rec["run_html_url"], "https://example.test/run/2")
+        self.assertEqual(rec["head_sha"], "abcdef1234567890")
+        self.assertEqual(rec["commit_message"], "Tune SDXL clip dispatch\n\nMore details.")
 
 
 if __name__ == "__main__":

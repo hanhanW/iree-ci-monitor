@@ -238,6 +238,14 @@ def fmt_iso(dt: datetime) -> str:
     return dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+def commit_message(run: dict) -> str | None:
+    head_commit = run.get("head_commit")
+    if not isinstance(head_commit, dict):
+        return None
+    message = head_commit.get("message")
+    return message if isinstance(message, str) and message else None
+
+
 def normalize_job(job: dict, run: dict, collected_at: datetime) -> dict:
     return {
         "run_id": int(job["run_id"]),
@@ -246,6 +254,9 @@ def normalize_job(job: dict, run: dict, collected_at: datetime) -> dict:
         "workflow_id": int(run.get("workflow_id", 0)) or None,
         "workflow_name": run.get("name") or job.get("workflow_name"),
         "workflow_path": run.get("path"),
+        "run_html_url": run.get("html_url"),
+        "head_sha": run.get("head_sha"),
+        "commit_message": commit_message(run),
         "name": job.get("name"),
         "labels": list(job.get("labels") or []),
         "runner_name": job.get("runner_name"),
