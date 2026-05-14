@@ -4,7 +4,9 @@ This directory is the static GitHub Pages payload for the benchmark dashboard.
 It is generated from checked-in benchmark result rows under `data/benchmarks/`.
 Those rows come from PkgCI summary artifacts such as
 `torch_models_amdgpu_mi325_summary.json/job_summary.json`, including entries
-like `sdxl/clip_benchmark_mi325.json` and `Current Time (ms)`.
+like `sdxl/clip_benchmark_mi325.json` and `Current Time (ms)`. The collector
+also understands Sharktank `time_summary` rows, for example `sdxl/clip_rocm.json`,
+when the workflow uploads the generated `job_summary.json` as a summary artifact.
 
 ```bash
 python3 scripts/dashboard.py --lookback-days 90
@@ -74,6 +76,17 @@ observed result rows.
 As of the current manifest, the configured benchmark suites include both
 `torch_models` and `sharktank_models`. If a suite has configured benchmark JSON
 files but no observed points, the dashboard lists missing examples in the Suite
-Coverage table. That usually means the corresponding PkgCI jobs did not upload
-a `*_summary.json/job_summary.json` benchmark table in the collected window, or
-they use a different result format that needs a parser.
+Coverage table.
+
+The upstream `iree-test-suites` harnesses produce different summary schemas:
+Torch models write a `benchmark` table with row-level status, while Sharktank
+benchmark tests write `time_summary`, `dispatch_summary`, and `size_summary`.
+This dashboard currently tracks time metrics, so it imports Torch `benchmark`
+rows and Sharktank `time_summary` rows. Sharktank `time_summary` does not carry
+row-level pass/fail status; imported rows are marked `REPORTED`.
+
+The current IREE PkgCI Sharktank workflow appends the Sharktank Markdown summary
+to `$GITHUB_STEP_SUMMARY`, but it does not upload `job_summary.json` as an
+Actions artifact. GitHub does not expose step summary Markdown through the
+Actions artifacts API, so Sharktank benchmark points will remain absent until
+that workflow publishes the JSON summary.

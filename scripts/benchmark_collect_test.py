@@ -82,6 +82,58 @@ class BenchmarkCollectTest(unittest.TestCase):
         self.assertEqual(rec["run_attempt"], 2)
         self.assertEqual(rec["artifact_name"], "torch_models_amdgpu_mi325_summary.json")
 
+    def test_normalizes_sharktank_time_summary_rows(self):
+        collect = load_module()
+        summary = {
+            "time_summary": [
+                ["sdxl", "clip", "42.5", 45.0],
+                ["sdxl", "vae", "N/A", 50.0],
+            ],
+            "dispatch_summary": [["sdxl", "clip", 12, 12]],
+        }
+        run = {
+            "run_id": 25753418567,
+            "run_html_url": "https://example.test/run",
+            "workflow_name": "PkgCI",
+            "workflow_path": ".github/workflows/pkgci.yml",
+            "head_branch": "main",
+            "event": "push",
+            "head_sha": "abcdef1234567890",
+            "commit_message": "Tune SDXL clip dispatch (#123)",
+            "created_at": "2026-05-12T18:14:32Z",
+        }
+        artifact = {
+            "id": 6952717694,
+            "name": "sharktank_models_amdgpu_rocm_mi300_gfx942_summary.json",
+            "created_at": "2026-05-12T18:36:43Z",
+        }
+
+        records = collect.normalized_records_from_summary(
+            summary,
+            run=run,
+            artifact=artifact,
+            collected_at=datetime(2026, 5, 14, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual(len(records), 1)
+        rec = records[0]
+        self.assertEqual(rec["section"], "time_summary")
+        self.assertEqual(rec["name"], "sdxl/clip_rocm.json")
+        self.assertEqual(rec["current_time_ms"], 42.5)
+        self.assertEqual(rec["golden_time_ms"], 45.0)
+        self.assertIsNone(rec["threshold_ms"])
+        self.assertEqual(rec["status"], "REPORTED")
+
+    def test_infers_sharktank_cpu_benchmark_name(self):
+        collect = load_module()
+
+        self.assertEqual(
+            collect.sharktank_benchmark_name(
+                "sdxl", "clip", "sharktank_models_cpu_task_summary.json"
+            ),
+            "sdxl/clip_cpu.json",
+        )
+
     def test_existing_artifact_ids_reads_all_benchmark_jsonl_files(self):
         collect = load_module()
         with tempfile.TemporaryDirectory() as td:

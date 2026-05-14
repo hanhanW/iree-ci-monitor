@@ -5,6 +5,11 @@ PkgCI jobs upload small artifacts such as
 `torch_models_amdgpu_mi325_summary.json` containing `job_summary.json`. Those
 files contain the actual benchmark rows shown in the GitHub Actions run summary,
 for example `sdxl/clip_benchmark_mi325.json` with `Current Time (ms)`.
+
+The IREE test suites currently emit two time-result schemas:
+
+* Torch models: `{"benchmark": {"headers": [...], "rows": [...]}}`
+* Sharktank models: `{"time_summary": [[model, submodel, current, golden], ...]}`
 """
 
 from __future__ import annotations
@@ -305,6 +310,73 @@ def row_dict(headers: list, row: list) -> dict:
     return {str(h): row[i] if i < len(row) else None for i, h in enumerate(headers)}
 
 
+def infer_backend_from_artifact_name(name: str | None) -> str | None:
+    """Infer Sharktank backend suffixes from PkgCI summary artifact names."""
+    if not name:
+        return None
+    lowered = name.lower()
+    if any(token in lowered for token in ("rocm", "amdgpu", "hip")):
+        return "rocm"
+    if "cpu" in lowered:
+        return "cpu"
+    return None
+
+
+def sharktank_benchmark_name(
+    model_name: str | None, submodel_name: str | None, artifact_name: str | None
+) -> str | None:
+    if not model_name or not submodel_name:
+        return None
+    backend = infer_backend_from_artifact_name(artifact_name)
+    stem = submodel_name
+    if backend and not stem.endswith(f"_{backend}"):
+        stem = f"{stem}_{backend}"
+    return f"{model_name}/{stem}.json"
+
+
+def normalized_record(
+    *,
+    run: dict,
+    artifact: dict,
+    collected_at: datetime,
+    section: str,
+    name: str,
+    current_time_ms: float,
+    golden_time_ms: float | None = None,
+    tolerance_factor: float | None = None,
+    threshold_ms: float | None = None,
+    status: str | None = None,
+) -> dict:
+    artifact_created = artifact.get("created_at")
+    return {
+        "schema_version": 1,
+        "repo": REPO,
+        "run_id": int(run["run_id"]),
+        "run_attempt": run.get("run_attempt"),
+        "run_html_url": run.get("run_html_url")
+        or f"https://github.com/{REPO}/actions/runs/{run['run_id']}",
+        "workflow_name": run.get("workflow_name"),
+        "workflow_path": run.get("workflow_path"),
+        "head_branch": run.get("head_branch"),
+        "event": run.get("event"),
+        "head_sha": run.get("head_sha"),
+        "commit_message": run.get("commit_message"),
+        "run_created_at": run.get("created_at"),
+        "artifact_id": int(artifact["id"]),
+        "artifact_name": artifact.get("name"),
+        "artifact_created_at": artifact_created,
+        "collected_at": fmt_iso(collected_at),
+        "section": section,
+        "name": name,
+        "current_time_ms": current_time_ms,
+        "golden_time_ms": golden_time_ms,
+        "tolerance_factor": tolerance_factor,
+        "threshold_ms": threshold_ms,
+        "status": status,
+        "source_file": "job_summary.json",
+    }
+
+
 def normalized_records_from_summary(
     summary: dict,
     *,
@@ -314,44 +386,48 @@ def normalized_records_from_summary(
 ) -> list[dict]:
     records: list[dict] = []
     benchmark = summary.get("benchmark")
-    if not isinstance(benchmark, dict):
-        return records
-    headers = list(benchmark.get("headers") or [])
-    for row in benchmark.get("rows") or []:
-        values = row_dict(headers, list(row))
-        name = values.get("Name")
-        current = number_or_none(values.get("Current Time (ms)"))
+    if isinstance(benchmark, dict):
+        headers = list(benchmark.get("headers") or [])
+        for row in benchmark.get("rows") or []:
+            values = row_dict(headers, list(row))
+            name = values.get("Name")
+            current = number_or_none(values.get("Current Time (ms)"))
+            if not name or current is None:
+                continue
+            records.append(
+                normalized_record(
+                    run=run,
+                    artifact=artifact,
+                    collected_at=collected_at,
+                    section="benchmark",
+                    name=name,
+                    current_time_ms=current,
+                    golden_time_ms=number_or_none(values.get("Golden Time (ms)")),
+                    tolerance_factor=number_or_none(values.get("Tolerance Factor")),
+                    threshold_ms=number_or_none(values.get("Threshold (ms)")),
+                    status=values.get("Status"),
+                )
+            )
+
+    for row in summary.get("time_summary") or []:
+        values = list(row)
+        if len(values) < 4:
+            continue
+        name = sharktank_benchmark_name(values[0], values[1], artifact.get("name"))
+        current = number_or_none(values[2])
         if not name or current is None:
             continue
-        artifact_created = artifact.get("created_at")
         records.append(
-            {
-                "schema_version": 1,
-                "repo": REPO,
-                "run_id": int(run["run_id"]),
-                "run_attempt": run.get("run_attempt"),
-                "run_html_url": run.get("run_html_url")
-                or f"https://github.com/{REPO}/actions/runs/{run['run_id']}",
-                "workflow_name": run.get("workflow_name"),
-                "workflow_path": run.get("workflow_path"),
-                "head_branch": run.get("head_branch"),
-                "event": run.get("event"),
-                "head_sha": run.get("head_sha"),
-                "commit_message": run.get("commit_message"),
-                "run_created_at": run.get("created_at"),
-                "artifact_id": int(artifact["id"]),
-                "artifact_name": artifact.get("name"),
-                "artifact_created_at": artifact_created,
-                "collected_at": fmt_iso(collected_at),
-                "section": "benchmark",
-                "name": name,
-                "current_time_ms": current,
-                "golden_time_ms": number_or_none(values.get("Golden Time (ms)")),
-                "tolerance_factor": number_or_none(values.get("Tolerance Factor")),
-                "threshold_ms": number_or_none(values.get("Threshold (ms)")),
-                "status": values.get("Status"),
-                "source_file": "job_summary.json",
-            }
+            normalized_record(
+                run=run,
+                artifact=artifact,
+                collected_at=collected_at,
+                section="time_summary",
+                name=name,
+                current_time_ms=current,
+                golden_time_ms=number_or_none(values[3]),
+                status="REPORTED",
+            )
         )
     return records
 

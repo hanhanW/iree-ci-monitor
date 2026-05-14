@@ -460,7 +460,7 @@
       return state.data.points.filter(p =>
         p.benchmark === benchmark &&
         p.labels_key === labels &&
-        (!successOnly || ["PASSED", "success", "completed"].includes(p.result_status || p.conclusion || p.status))
+        (!successOnly || ["PASSED", "success", "completed", "REPORTED"].includes(p.result_status || p.conclusion || p.status))
       );
     }
 

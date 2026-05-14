@@ -933,7 +933,7 @@ def render_html(data_filename: str = "benchmark-data.json", embedded_data: dict 
       return state.data.points.filter(p =>
         p.benchmark === benchmark &&
         p.labels_key === labels &&
-        (!successOnly || ["PASSED", "success", "completed"].includes(p.result_status || p.conclusion || p.status))
+        (!successOnly || ["PASSED", "success", "completed", "REPORTED"].includes(p.result_status || p.conclusion || p.status))
       );
     }}
 
