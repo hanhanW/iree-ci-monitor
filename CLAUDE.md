@@ -53,6 +53,8 @@ mislead triage. Favor fewer, correct signals over many noisy ones.
 ```
 iree-ci-monitor/
 ├── .github/workflows/monitor.yml   # 6h cron + workflow_dispatch
+├── .beads/                         # Beads issue tracker state for repo work
+├── .codex/skills/                  # Project-local Codex workflow guidance
 ├── scripts/
 │   ├── collect.py                  # fetch new runs+jobs, append JSONL
 │   └── report.py                   # aggregate + render Markdown
@@ -101,6 +103,26 @@ Data flow each tick:
   (b) it saw ≥ `PERSISTENT_RUNNER_MIN_JOBS` jobs. Label gate excludes
   auto-scaler pools; the job-count gate catches small-pool autoscalers
   (`macos-15-intel`, `ah-ubuntu_22_04-c7g_4x-50`) whose names are per-spawn.
+
+## Task Tracking
+
+Use beads (`br`) for durable task tracking in this repository. The issue ID
+prefix is `icm`, configured in `.beads/config.yaml`. Beads state is committed
+with the repo through `.beads/issues.jsonl`; local SQLite/runtime files stay
+inside `.beads/` and are ignored by the beads-generated `.beads/.gitignore`.
+
+For agent workflow details, use the project-local Codex skill:
+`.codex/skills/iree-ci-monitor-beads/SKILL.md`.
+
+Typical commands:
+
+```bash
+br ready
+br list --status open
+br create "Investigate stale runner signal" --type task --priority 2 --labels reporter
+br sync --status
+br sync --flush-only
+```
 
 ## Alert thresholds
 
