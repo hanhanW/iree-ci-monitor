@@ -63,6 +63,15 @@ def iter_jsonl(path: Path) -> Iterable[dict]:
                 continue
 
 
+def read_json(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return None
+
+
 def files_in_days(now: datetime, lookback_days: int, data_dir: Path = DATA_DIR) -> list[Path]:
     start = now - timedelta(days=lookback_days)
     paths: list[Path] = []
@@ -148,6 +157,105 @@ def _pr_title(subject: str | None) -> str | None:
     if not match:
         return None
     return match.group("title").strip()
+
+
+def _suite_configs(suite_manifest: dict | None, kind: str | None = None) -> list[dict]:
+    configs: list[dict] = []
+    if not suite_manifest:
+        return configs
+    for suite in suite_manifest.get("suites") or []:
+        suite_name = suite.get("name") or "unknown"
+        for config in suite.get("configs") or []:
+            if kind is not None and config.get("kind") != kind:
+                continue
+            entry = dict(config)
+            entry["suite"] = suite_name
+            configs.append(entry)
+    return configs
+
+
+def _point_matches_config(point: dict, config: dict) -> bool:
+    benchmark = point.get("benchmark") or ""
+    config_path = config.get("path") or ""
+    config_name = config.get("name") or Path(config_path).name
+    return (
+        benchmark == config_path
+        or benchmark == config_name
+        or config_path.endswith("/" + benchmark)
+    )
+
+
+def _infer_suite(point: dict, suite_manifest: dict | None) -> str | None:
+    suite_names = [
+        suite.get("name")
+        for suite in (suite_manifest or {}).get("suites", [])
+        if suite.get("name")
+    ]
+    target = point.get("target") or point.get("labels_key") or ""
+    for suite_name in sorted(suite_names, key=len, reverse=True):
+        if target == suite_name or target.startswith(suite_name + "_"):
+            return suite_name
+    for config in _suite_configs(suite_manifest, kind="benchmark"):
+        if _point_matches_config(point, config):
+            return config["suite"]
+    return None
+
+
+def _annotate_suites(points: list[dict], suite_manifest: dict | None) -> None:
+    for point in points:
+        suite = _infer_suite(point, suite_manifest)
+        if suite:
+            point["suite"] = suite
+
+
+def _suite_coverage(suite_manifest: dict | None, points: list[dict]) -> list[dict]:
+    if not suite_manifest:
+        return []
+    rows = []
+    benchmark_configs = _suite_configs(suite_manifest, kind="benchmark")
+    points_by_suite: Counter[str] = Counter()
+    observed_names_by_suite: dict[str, set[str]] = {}
+    matched_configs_by_suite: dict[str, set[str]] = {}
+    for point in points:
+        suite = point.get("suite") or "unmatched"
+        points_by_suite[suite] += 1
+        observed_names_by_suite.setdefault(suite, set()).add(point.get("benchmark") or "unknown")
+        for config in benchmark_configs:
+            if config["suite"] == suite and _point_matches_config(point, config):
+                matched_configs_by_suite.setdefault(suite, set()).add(config["path"])
+    for suite in suite_manifest.get("suites") or []:
+        suite_name = suite.get("name") or "unknown"
+        configured = [
+            config
+            for config in suite.get("configs") or []
+            if config.get("kind") == "benchmark"
+        ]
+        matched = matched_configs_by_suite.get(suite_name, set())
+        missing = [config["path"] for config in configured if config["path"] not in matched]
+        rows.append(
+            {
+                "suite": suite_name,
+                "suite_url": suite.get("html_url"),
+                "configured_benchmarks": len(configured),
+                "observed_configured_benchmarks": len(matched),
+                "observed_benchmark_names": len(observed_names_by_suite.get(suite_name, set())),
+                "points": points_by_suite.get(suite_name, 0),
+                "missing_benchmark_examples": missing[:8],
+            }
+        )
+    if points_by_suite.get("unmatched"):
+        rows.append(
+            {
+                "suite": "unmatched",
+                "suite_url": None,
+                "configured_benchmarks": 0,
+                "observed_configured_benchmarks": 0,
+                "observed_benchmark_names": len(observed_names_by_suite.get("unmatched", set())),
+                "points": points_by_suite["unmatched"],
+                "missing_benchmark_examples": [],
+            }
+        )
+    return rows
 
 
 def _benchmark_files_in_days(
@@ -292,6 +400,7 @@ def build_dashboard_data(
     data_dir: Path = DATA_DIR,
 ) -> dict:
     points, skipped = _benchmark_result_points(now, lookback_days, data_dir)
+    suite_manifest = read_json(data_dir / "benchmark_suites.json")
     current_level = "benchmark_result"
     metrics = ["current_time_ms", "golden_time_ms", "threshold_ms"]
     primary_metric = "current_time_ms"
@@ -300,6 +409,7 @@ def build_dashboard_data(
         current_level = "job_timing_proxy"
         metrics = ["duration_s", "queue_s", "total_s"]
         primary_metric = "duration_s"
+    _annotate_suites(points, suite_manifest)
 
     group_values: dict[tuple[str, str], list[float]] = {}
     for p in points:
@@ -317,6 +427,8 @@ def build_dashboard_data(
     ]
 
     commit_points = sum(1 for p in points if p["commit"])
+    suite_coverage = _suite_coverage(suite_manifest, points)
+    configured_benchmarks = sum(row["configured_benchmarks"] for row in suite_coverage)
     return {
         "schema_version": 1,
         "generated_at": fmt_iso(now),
@@ -334,8 +446,15 @@ def build_dashboard_data(
             "groups": len(groups),
             "points_with_commit": commit_points,
             "points_without_commit": len(points) - commit_points,
+            "configured_benchmarks": configured_benchmarks,
+            "suites": len(suite_coverage),
             "skipped": dict(skipped),
         },
+        "suite_manifest": {
+            "generated_at": suite_manifest.get("generated_at"),
+            "suite_root_url": suite_manifest.get("suite_root_url"),
+        } if suite_manifest else None,
+        "suite_coverage": suite_coverage,
         "groups": groups,
         "points": points,
     }
@@ -530,6 +649,7 @@ def render_html(data_filename: str = "benchmark-data.json", embedded_data: dict 
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(360px, 0.45fr);
       gap: 14px;
+      margin-bottom: 14px;
     }}
     section {{
       border: 1px solid var(--border);
@@ -654,6 +774,16 @@ def render_html(data_filename: str = "benchmark-data.json", embedded_data: dict 
         </div>
       </section>
     </div>
+
+    <section>
+      <h2>Suite Coverage</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>suite</th><th>observed points</th><th>observed configs</th><th>configured benchmarks</th><th>missing examples</th></tr></thead>
+          <tbody id="suiteBody"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   {embedded_json}<script>
@@ -1049,6 +1179,25 @@ def render_html(data_filename: str = "benchmark-data.json", embedded_data: dict 
       document.getElementById("rangesBody").innerHTML = rangeRows || `<tr><td colspan="4" class="empty">No >=10% rolling-window changes in this selection.</td></tr>`;
     }}
 
+    function renderSuiteCoverage() {{
+      const rows = state.data.suite_coverage || [];
+      const html = rows.map(row => {{
+        const suite = row.suite_url
+          ? `<a ${{linkAttrs(row.suite_url)}}>${{escapeHtml(row.suite)}}</a>`
+          : escapeHtml(row.suite);
+        const missing = (row.missing_benchmark_examples || []).map(escapeHtml).join("<br>");
+        const observed = `${{Number(row.observed_configured_benchmarks || 0).toLocaleString()}} / ${{Number(row.observed_benchmark_names || 0).toLocaleString()}}`;
+        return `<tr>
+          <td>${{suite}}</td>
+          <td>${{Number(row.points || 0).toLocaleString()}}</td>
+          <td>${{observed}}</td>
+          <td>${{Number(row.configured_benchmarks || 0).toLocaleString()}}</td>
+          <td>${{missing || '<span class="muted">none</span>'}}</td>
+        </tr>`;
+      }}).join("");
+      document.getElementById("suiteBody").innerHTML = html || `<tr><td colspan="5" class="empty">No benchmark suite manifest was generated.</td></tr>`;
+    }}
+
     function update() {{
       const metric = document.getElementById("metric").value;
       const width = Math.max(1, Number.parseInt(document.getElementById("window").value, 10) || 5);
@@ -1091,6 +1240,7 @@ def render_html(data_filename: str = "benchmark-data.json", embedded_data: dict 
       populateMetrics();
       populateControls();
       restoreControls();
+      renderSuiteCoverage();
       update();
       for (const id of ["benchmark", "labels", "metric", "window", "successOnly"]) {{
         document.getElementById(id).addEventListener("change", () => {{

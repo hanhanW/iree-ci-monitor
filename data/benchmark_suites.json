@@ -1,0 +1,701 @@
+{
+  "generated_at": "2026-05-14T23:39:31.987757Z",
+  "ref": "main",
+  "repo": "iree-org/iree",
+  "schema_version": 1,
+  "suite_root": "tests/external/iree-test-suites",
+  "suite_root_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites",
+  "suites": [
+    {
+      "configs": [
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_models/onnx_models_cpu_llvm_task.json",
+          "kind": "other",
+          "name": "onnx_models_cpu_llvm_task.json",
+          "path": "onnx_models_cpu_llvm_task.json",
+          "size": 2849
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_models/onnx_models_gpu_hip_rdna3.json",
+          "kind": "other",
+          "name": "onnx_models_gpu_hip_rdna3.json",
+          "path": "onnx_models_gpu_hip_rdna3.json",
+          "size": 2524
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_models/onnx_models_gpu_hip_rdna4.json",
+          "kind": "other",
+          "name": "onnx_models_gpu_hip_rdna4.json",
+          "path": "onnx_models_gpu_hip_rdna4.json",
+          "size": 2524
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_models/onnx_models_gpu_vulkan.json",
+          "kind": "other",
+          "name": "onnx_models_gpu_vulkan.json",
+          "path": "onnx_models_gpu_vulkan.json",
+          "size": 1386
+        }
+      ],
+      "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_models",
+      "kind_counts": {
+        "other": 4
+      },
+      "name": "onnx_models",
+      "path": "tests/external/iree-test-suites/onnx_models"
+    },
+    {
+      "configs": [
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_cpu_llvm_sync_O0.json",
+          "kind": "other",
+          "name": "onnx_ops_cpu_llvm_sync_O0.json",
+          "path": "onnx_ops_cpu_llvm_sync_O0.json",
+          "size": 20725
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_cpu_llvm_sync_O2.json",
+          "kind": "other",
+          "name": "onnx_ops_cpu_llvm_sync_O2.json",
+          "path": "onnx_ops_cpu_llvm_sync_O2.json",
+          "size": 20678
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_cuda_O0.json",
+          "kind": "other",
+          "name": "onnx_ops_gpu_cuda_O0.json",
+          "path": "onnx_ops_gpu_cuda_O0.json",
+          "size": 30681
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_hip_rdna3_O0.json",
+          "kind": "other",
+          "name": "onnx_ops_gpu_hip_rdna3_O0.json",
+          "path": "onnx_ops_gpu_hip_rdna3_O0.json",
+          "size": 22682
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_hip_rdna3_O3.json",
+          "kind": "other",
+          "name": "onnx_ops_gpu_hip_rdna3_O3.json",
+          "path": "onnx_ops_gpu_hip_rdna3_O3.json",
+          "size": 22282
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_hip_rdna4_O3.json",
+          "kind": "other",
+          "name": "onnx_ops_gpu_hip_rdna4_O3.json",
+          "path": "onnx_ops_gpu_hip_rdna4_O3.json",
+          "size": 22282
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_vulkan_rdna3_O0.json",
+          "kind": "other",
+          "name": "onnx_ops_gpu_vulkan_rdna3_O0.json",
+          "path": "onnx_ops_gpu_vulkan_rdna3_O0.json",
+          "size": 23403
+        }
+      ],
+      "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops",
+      "kind_counts": {
+        "other": 7
+      },
+      "name": "onnx_ops",
+      "path": "tests/external/iree-test-suites/onnx_ops"
+    },
+    {
+      "configs": [
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/llama/8b_f16_decode_data_tiling_rocm.json",
+          "kind": "benchmark",
+          "name": "8b_f16_decode_data_tiling_rocm.json",
+          "path": "benchmarks/llama/8b_f16_decode_data_tiling_rocm.json",
+          "size": 447
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/llama/8b_f16_decode_rocm.json",
+          "kind": "benchmark",
+          "name": "8b_f16_decode_rocm.json",
+          "path": "benchmarks/llama/8b_f16_decode_rocm.json",
+          "size": 446
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/llama/8b_f16_prefill_data_tiling_rocm.json",
+          "kind": "benchmark",
+          "name": "8b_f16_prefill_data_tiling_rocm.json",
+          "path": "benchmarks/llama/8b_f16_prefill_data_tiling_rocm.json",
+          "size": 433
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/llama/8b_f16_prefill_rocm.json",
+          "kind": "benchmark",
+          "name": "8b_f16_prefill_rocm.json",
+          "path": "benchmarks/llama/8b_f16_prefill_rocm.json",
+          "size": 433
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/sdxl/clip_cpu.json",
+          "kind": "benchmark",
+          "name": "clip_cpu.json",
+          "path": "benchmarks/sdxl/clip_cpu.json",
+          "size": 543
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/sdxl/clip_rocm.json",
+          "kind": "benchmark",
+          "name": "clip_rocm.json",
+          "path": "benchmarks/sdxl/clip_rocm.json",
+          "size": 725
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/sdxl/e2e_rocm.json",
+          "kind": "benchmark",
+          "name": "e2e_rocm.json",
+          "path": "benchmarks/sdxl/e2e_rocm.json",
+          "size": 1013
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/sdxl/punet_int8_fp16_rocm.json",
+          "kind": "benchmark",
+          "name": "punet_int8_fp16_rocm.json",
+          "path": "benchmarks/sdxl/punet_int8_fp16_rocm.json",
+          "size": 770
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/sdxl/punet_int8_fp8_rocm.json",
+          "kind": "benchmark",
+          "name": "punet_int8_fp8_rocm.json",
+          "path": "benchmarks/sdxl/punet_int8_fp8_rocm.json",
+          "size": 774
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/sdxl/unet_fp16_rocm.json",
+          "kind": "benchmark",
+          "name": "unet_fp16_rocm.json",
+          "path": "benchmarks/sdxl/unet_fp16_rocm.json",
+          "size": 775
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/benchmarks/sdxl/vae_rocm.json",
+          "kind": "benchmark",
+          "name": "vae_rocm.json",
+          "path": "benchmarks/sdxl/vae_rocm.json",
+          "size": 664
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/llama/8b_f16_decode_data_tiling_rocm.json",
+          "kind": "quality",
+          "name": "8b_f16_decode_data_tiling_rocm.json",
+          "path": "quality_tests/llama/8b_f16_decode_data_tiling_rocm.json",
+          "size": 1425
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/llama/8b_f16_decode_rocm.json",
+          "kind": "quality",
+          "name": "8b_f16_decode_rocm.json",
+          "path": "quality_tests/llama/8b_f16_decode_rocm.json",
+          "size": 1377
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/llama/8b_f16_prefill_data_tiling_rocm.json",
+          "kind": "quality",
+          "name": "8b_f16_prefill_data_tiling_rocm.json",
+          "path": "quality_tests/llama/8b_f16_prefill_data_tiling_rocm.json",
+          "size": 1248
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/llama/8b_f16_prefill_rocm.json",
+          "kind": "quality",
+          "name": "8b_f16_prefill_rocm.json",
+          "path": "quality_tests/llama/8b_f16_prefill_rocm.json",
+          "size": 1200
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sd3/clip_cpu.json",
+          "kind": "quality",
+          "name": "clip_cpu.json",
+          "path": "quality_tests/sd3/clip_cpu.json",
+          "size": 2092
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sd3/clip_rocm.json",
+          "kind": "quality",
+          "name": "clip_rocm.json",
+          "path": "quality_tests/sd3/clip_rocm.json",
+          "size": 2283
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sd3/mmdit_cpu.json",
+          "kind": "quality",
+          "name": "mmdit_cpu.json",
+          "path": "quality_tests/sd3/mmdit_cpu.json",
+          "size": 1464
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sd3/mmdit_rocm.json",
+          "kind": "quality",
+          "name": "mmdit_rocm.json",
+          "path": "quality_tests/sd3/mmdit_rocm.json",
+          "size": 1689
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sd3/vae_cpu.json",
+          "kind": "quality",
+          "name": "vae_cpu.json",
+          "path": "quality_tests/sd3/vae_cpu.json",
+          "size": 973
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sd3/vae_rocm.json",
+          "kind": "quality",
+          "name": "vae_rocm.json",
+          "path": "quality_tests/sd3/vae_rocm.json",
+          "size": 1141
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/clip_cpu.json",
+          "kind": "quality",
+          "name": "clip_cpu.json",
+          "path": "quality_tests/sdxl/clip_cpu.json",
+          "size": 1909
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/clip_rocm.json",
+          "kind": "quality",
+          "name": "clip_rocm.json",
+          "path": "quality_tests/sdxl/clip_rocm.json",
+          "size": 2130
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/punet_int8_fp16_rocm.json",
+          "kind": "quality",
+          "name": "punet_int8_fp16_rocm.json",
+          "path": "quality_tests/sdxl/punet_int8_fp16_rocm.json",
+          "size": 2534
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/punet_int8_fp8_rocm.json",
+          "kind": "quality",
+          "name": "punet_int8_fp8_rocm.json",
+          "path": "quality_tests/sdxl/punet_int8_fp8_rocm.json",
+          "size": 2506
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/scheduler_cpu.json",
+          "kind": "quality",
+          "name": "scheduler_cpu.json",
+          "path": "quality_tests/sdxl/scheduler_cpu.json",
+          "size": 387
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/scheduler_rocm.json",
+          "kind": "quality",
+          "name": "scheduler_rocm.json",
+          "path": "quality_tests/sdxl/scheduler_rocm.json",
+          "size": 623
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/unet_fp16_960_1024_cpu.json",
+          "kind": "quality",
+          "name": "unet_fp16_960_1024_cpu.json",
+          "path": "quality_tests/sdxl/unet_fp16_960_1024_cpu.json",
+          "size": 1619
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/unet_fp16_960_1024_rocm.json",
+          "kind": "quality",
+          "name": "unet_fp16_960_1024_rocm.json",
+          "path": "quality_tests/sdxl/unet_fp16_960_1024_rocm.json",
+          "size": 2094
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/unet_fp16_cpu.json",
+          "kind": "quality",
+          "name": "unet_fp16_cpu.json",
+          "path": "quality_tests/sdxl/unet_fp16_cpu.json",
+          "size": 1882
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/unet_fp16_rocm.json",
+          "kind": "quality",
+          "name": "unet_fp16_rocm.json",
+          "path": "quality_tests/sdxl/unet_fp16_rocm.json",
+          "size": 2411
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/vae_cpu.json",
+          "kind": "quality",
+          "name": "vae_cpu.json",
+          "path": "quality_tests/sdxl/vae_cpu.json",
+          "size": 1004
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models/quality_tests/sdxl/vae_rocm.json",
+          "kind": "quality",
+          "name": "vae_rocm.json",
+          "path": "quality_tests/sdxl/vae_rocm.json",
+          "size": 1301
+        }
+      ],
+      "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/sharktank_models",
+      "kind_counts": {
+        "benchmark": 11,
+        "quality": 22
+      },
+      "name": "sharktank_models",
+      "path": "tests/external/iree-test-suites/sharktank_models"
+    },
+    {
+      "configs": [],
+      "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/test_suite_files",
+      "kind_counts": {},
+      "name": "test_suite_files",
+      "path": "tests/external/iree-test-suites/test_suite_files"
+    },
+    {
+      "configs": [
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp16/decode_benchmark_seq128_mi325.json",
+          "kind": "benchmark",
+          "name": "decode_benchmark_seq128_mi325.json",
+          "path": "llama_8b_fp16/decode_benchmark_seq128_mi325.json",
+          "size": 775
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp16/decode_benchmark_seq2048_mi325.json",
+          "kind": "benchmark",
+          "name": "decode_benchmark_seq2048_mi325.json",
+          "path": "llama_8b_fp16/decode_benchmark_seq2048_mi325.json",
+          "size": 776
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp16/prefill_benchmark_seq128_mi325.json",
+          "kind": "benchmark",
+          "name": "prefill_benchmark_seq128_mi325.json",
+          "path": "llama_8b_fp16/prefill_benchmark_seq128_mi325.json",
+          "size": 736
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp16/prefill_benchmark_seq2048_mi325.json",
+          "kind": "benchmark",
+          "name": "prefill_benchmark_seq2048_mi325.json",
+          "path": "llama_8b_fp16/prefill_benchmark_seq2048_mi325.json",
+          "size": 739
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/decode_benchmark_seq128_mi325.json",
+          "kind": "benchmark",
+          "name": "decode_benchmark_seq128_mi325.json",
+          "path": "llama_8b_fp8/decode_benchmark_seq128_mi325.json",
+          "size": 779
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/decode_benchmark_seq128_mi325_data_tiling.json",
+          "kind": "benchmark",
+          "name": "decode_benchmark_seq128_mi325_data_tiling.json",
+          "path": "llama_8b_fp8/decode_benchmark_seq128_mi325_data_tiling.json",
+          "size": 804
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/decode_benchmark_seq2048_mi325.json",
+          "kind": "benchmark",
+          "name": "decode_benchmark_seq2048_mi325.json",
+          "path": "llama_8b_fp8/decode_benchmark_seq2048_mi325.json",
+          "size": 782
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/decode_benchmark_seq2048_mi325_data_tiling.json",
+          "kind": "benchmark",
+          "name": "decode_benchmark_seq2048_mi325_data_tiling.json",
+          "path": "llama_8b_fp8/decode_benchmark_seq2048_mi325_data_tiling.json",
+          "size": 805
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/prefill_benchmark_seq128_mi325.json",
+          "kind": "benchmark",
+          "name": "prefill_benchmark_seq128_mi325.json",
+          "path": "llama_8b_fp8/prefill_benchmark_seq128_mi325.json",
+          "size": 741
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/prefill_benchmark_seq128_mi325_data_tiling.json",
+          "kind": "benchmark",
+          "name": "prefill_benchmark_seq128_mi325_data_tiling.json",
+          "path": "llama_8b_fp8/prefill_benchmark_seq128_mi325_data_tiling.json",
+          "size": 765
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/prefill_benchmark_seq2048_mi325.json",
+          "kind": "benchmark",
+          "name": "prefill_benchmark_seq2048_mi325.json",
+          "path": "llama_8b_fp8/prefill_benchmark_seq2048_mi325.json",
+          "size": 744
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/prefill_benchmark_seq2048_mi325_data_tiling.json",
+          "kind": "benchmark",
+          "name": "prefill_benchmark_seq2048_mi325_data_tiling.json",
+          "path": "llama_8b_fp8/prefill_benchmark_seq2048_mi325_data_tiling.json",
+          "size": 766
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/clip_benchmark_cpu.json",
+          "kind": "benchmark",
+          "name": "clip_benchmark_cpu.json",
+          "path": "sdxl/clip_benchmark_cpu.json",
+          "size": 805
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/clip_benchmark_mi325.json",
+          "kind": "benchmark",
+          "name": "clip_benchmark_mi325.json",
+          "path": "sdxl/clip_benchmark_mi325.json",
+          "size": 794
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/punet_benchmark_mi325.json",
+          "kind": "benchmark",
+          "name": "punet_benchmark_mi325.json",
+          "path": "sdxl/punet_benchmark_mi325.json",
+          "size": 1642
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/punet_benchmark_mi325_v2.json",
+          "kind": "benchmark",
+          "name": "punet_benchmark_mi325_v2.json",
+          "path": "sdxl/punet_benchmark_mi325_v2.json",
+          "size": 871
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/vae_benchmark_mi325.json",
+          "kind": "benchmark",
+          "name": "vae_benchmark_mi325.json",
+          "path": "sdxl/vae_benchmark_mi325.json",
+          "size": 686
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp16/compstat_gfx942.json",
+          "kind": "compilation_stats",
+          "name": "compstat_gfx942.json",
+          "path": "llama_8b_fp16/compstat_gfx942.json",
+          "size": 185
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/compstat_gfx942.json",
+          "kind": "compilation_stats",
+          "name": "compstat_gfx942.json",
+          "path": "llama_8b_fp8/compstat_gfx942.json",
+          "size": 184
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/compstat_gfx942_data_tiling.json",
+          "kind": "compilation_stats",
+          "name": "compstat_gfx942_data_tiling.json",
+          "path": "llama_8b_fp8/compstat_gfx942_data_tiling.json",
+          "size": 196
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/clip_compstat_cpu.json",
+          "kind": "compilation_stats",
+          "name": "clip_compstat_cpu.json",
+          "path": "sdxl/clip_compstat_cpu.json",
+          "size": 149
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/clip_compstat_gfx942.json",
+          "kind": "compilation_stats",
+          "name": "clip_compstat_gfx942.json",
+          "path": "sdxl/clip_compstat_gfx942.json",
+          "size": 173
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/punet_compstat_gfx942.json",
+          "kind": "compilation_stats",
+          "name": "punet_compstat_gfx942.json",
+          "path": "sdxl/punet_compstat_gfx942.json",
+          "size": 193
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/punet_compstat_gfx942_v2.json",
+          "kind": "compilation_stats",
+          "name": "punet_compstat_gfx942_v2.json",
+          "path": "sdxl/punet_compstat_gfx942_v2.json",
+          "size": 196
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/vae_compstat_gfx942.json",
+          "kind": "compilation_stats",
+          "name": "vae_compstat_gfx942.json",
+          "path": "sdxl/vae_compstat_gfx942.json",
+          "size": 124
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp16/modules/llama_gfx942.json",
+          "kind": "module",
+          "name": "llama_gfx942.json",
+          "path": "llama_8b_fp16/modules/llama_gfx942.json",
+          "size": 563
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp16/modules/scheduler_gfx942.json",
+          "kind": "module",
+          "name": "scheduler_gfx942.json",
+          "path": "llama_8b_fp16/modules/scheduler_gfx942.json",
+          "size": 462
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/modules/llama_gfx942.json",
+          "kind": "module",
+          "name": "llama_gfx942.json",
+          "path": "llama_8b_fp8/modules/llama_gfx942.json",
+          "size": 551
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp8/modules/llama_gfx942_data_tiling.json",
+          "kind": "module",
+          "name": "llama_gfx942_data_tiling.json",
+          "path": "llama_8b_fp8/modules/llama_gfx942_data_tiling.json",
+          "size": 597
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/modules/clip_cpu.json",
+          "kind": "module",
+          "name": "clip_cpu.json",
+          "path": "sdxl/modules/clip_cpu.json",
+          "size": 531
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/modules/clip_gfx942.json",
+          "kind": "module",
+          "name": "clip_gfx942.json",
+          "path": "sdxl/modules/clip_gfx942.json",
+          "size": 590
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/modules/punet_gfx942.json",
+          "kind": "module",
+          "name": "punet_gfx942.json",
+          "path": "sdxl/modules/punet_gfx942.json",
+          "size": 547
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/modules/punet_gfx942_v2.json",
+          "kind": "module",
+          "name": "punet_gfx942_v2.json",
+          "path": "sdxl/modules/punet_gfx942_v2.json",
+          "size": 442
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/modules/vae_cpu.json",
+          "kind": "module",
+          "name": "vae_cpu.json",
+          "path": "sdxl/modules/vae_cpu.json",
+          "size": 377
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/modules/vae_gfx942.json",
+          "kind": "module",
+          "name": "vae_gfx942.json",
+          "path": "sdxl/modules/vae_gfx942.json",
+          "size": 590
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/llama_8b_fp16/quality_gfx942.json",
+          "kind": "quality",
+          "name": "quality_gfx942.json",
+          "path": "llama_8b_fp16/quality_gfx942.json",
+          "size": 524
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/clip_quality_cpu.json",
+          "kind": "quality",
+          "name": "clip_quality_cpu.json",
+          "path": "sdxl/clip_quality_cpu.json",
+          "size": 1578
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/clip_quality_gfx942.json",
+          "kind": "quality",
+          "name": "clip_quality_gfx942.json",
+          "path": "sdxl/clip_quality_gfx942.json",
+          "size": 1570
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/punet_quality_gfx942.json",
+          "kind": "quality",
+          "name": "punet_quality_gfx942.json",
+          "path": "sdxl/punet_quality_gfx942.json",
+          "size": 1785
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/vae_quality_cpu.json",
+          "kind": "quality",
+          "name": "vae_quality_cpu.json",
+          "path": "sdxl/vae_quality_cpu.json",
+          "size": 947
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models/sdxl/vae_quality_gfx942.json",
+          "kind": "quality",
+          "name": "vae_quality_gfx942.json",
+          "path": "sdxl/vae_quality_gfx942.json",
+          "size": 961
+        }
+      ],
+      "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_models",
+      "kind_counts": {
+        "benchmark": 17,
+        "compilation_stats": 8,
+        "module": 10,
+        "quality": 6
+      },
+      "name": "torch_models",
+      "path": "tests/external/iree-test-suites/torch_models"
+    },
+    {
+      "configs": [
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_ops/torch_ops_cpu_llvm_sync.json",
+          "kind": "other",
+          "name": "torch_ops_cpu_llvm_sync.json",
+          "path": "torch_ops_cpu_llvm_sync.json",
+          "size": 791
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_ops/torch_ops_gpu_hip_gfx1100_O3.json",
+          "kind": "other",
+          "name": "torch_ops_gpu_hip_gfx1100_O3.json",
+          "path": "torch_ops_gpu_hip_gfx1100_O3.json",
+          "size": 714
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_ops/torch_ops_gpu_hip_gfx1201_O3.json",
+          "kind": "other",
+          "name": "torch_ops_gpu_hip_gfx1201_O3.json",
+          "path": "torch_ops_gpu_hip_gfx1201_O3.json",
+          "size": 716
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_ops/torch_ops_gpu_hip_gfx942_O3.json",
+          "kind": "other",
+          "name": "torch_ops_gpu_hip_gfx942_O3.json",
+          "path": "torch_ops_gpu_hip_gfx942_O3.json",
+          "size": 684
+        },
+        {
+          "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_ops/torch_ops_gpu_vulkan_rdna3_O3.json",
+          "kind": "other",
+          "name": "torch_ops_gpu_vulkan_rdna3_O3.json",
+          "path": "torch_ops_gpu_vulkan_rdna3_O3.json",
+          "size": 1221
+        }
+      ],
+      "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/torch_ops",
+      "kind_counts": {
+        "other": 5
+      },
+      "name": "torch_ops",
+      "path": "tests/external/iree-test-suites/torch_ops"
+    }
+  ]
+}

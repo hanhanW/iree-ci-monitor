@@ -42,6 +42,11 @@ jobs:
           IREE_BENCHMARK_LOOKBACK_DAYS: "3"
         run: python scripts/benchmark_collect.py
 
+      - name: Benchmark suite manifest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/benchmark_suite_manifest.py
+
       - name: Dashboard
         run: python scripts/dashboard.py
 

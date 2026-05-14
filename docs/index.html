@@ -176,6 +176,7 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(360px, 0.45fr);
       gap: 14px;
+      margin-bottom: 14px;
     }
     section {
       border: 1px solid var(--border);
@@ -300,6 +301,16 @@
         </div>
       </section>
     </div>
+
+    <section>
+      <h2>Suite Coverage</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>suite</th><th>observed points</th><th>observed configs</th><th>configured benchmarks</th><th>missing examples</th></tr></thead>
+          <tbody id="suiteBody"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <script>
@@ -695,6 +706,25 @@
       document.getElementById("rangesBody").innerHTML = rangeRows || `<tr><td colspan="4" class="empty">No >=10% rolling-window changes in this selection.</td></tr>`;
     }
 
+    function renderSuiteCoverage() {
+      const rows = state.data.suite_coverage || [];
+      const html = rows.map(row => {
+        const suite = row.suite_url
+          ? `<a ${linkAttrs(row.suite_url)}>${escapeHtml(row.suite)}</a>`
+          : escapeHtml(row.suite);
+        const missing = (row.missing_benchmark_examples || []).map(escapeHtml).join("<br>");
+        const observed = `${Number(row.observed_configured_benchmarks || 0).toLocaleString()} / ${Number(row.observed_benchmark_names || 0).toLocaleString()}`;
+        return `<tr>
+          <td>${suite}</td>
+          <td>${Number(row.points || 0).toLocaleString()}</td>
+          <td>${observed}</td>
+          <td>${Number(row.configured_benchmarks || 0).toLocaleString()}</td>
+          <td>${missing || '<span class="muted">none</span>'}</td>
+        </tr>`;
+      }).join("");
+      document.getElementById("suiteBody").innerHTML = html || `<tr><td colspan="5" class="empty">No benchmark suite manifest was generated.</td></tr>`;
+    }
+
     function update() {
       const metric = document.getElementById("metric").value;
       const width = Math.max(1, Number.parseInt(document.getElementById("window").value, 10) || 5);
@@ -737,6 +767,7 @@
       populateMetrics();
       populateControls();
       restoreControls();
+      renderSuiteCoverage();
       update();
       for (const id of ["benchmark", "labels", "metric", "window", "successOnly"]) {
         document.getElementById(id).addEventListener("change", () => {

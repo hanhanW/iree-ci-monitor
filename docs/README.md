@@ -63,3 +63,17 @@ tooltip or press Escape to unpin it.
 Candidate ranges compare rolling windows and list changes of at least 10%.
 Positive changes are shown as regressions for time-based metrics; negative
 changes are shown as improvements.
+
+## Suite Coverage
+
+`scripts/benchmark_suite_manifest.py` reads the IREE benchmark suite config from
+`tests/external/iree-test-suites` and writes `data/benchmark_suites.json`. The
+dashboard uses that manifest to show which configured benchmark suites have
+observed result rows.
+
+As of the current manifest, the configured benchmark suites include both
+`torch_models` and `sharktank_models`. If a suite has configured benchmark JSON
+files but no observed points, the dashboard lists missing examples in the Suite
+Coverage table. That usually means the corresponding PkgCI jobs did not upload
+a `*_summary.json/job_summary.json` benchmark table in the collected window, or
+they use a different result format that needs a parser.

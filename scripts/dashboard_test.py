@@ -56,6 +56,39 @@ class DashboardDataTest(unittest.TestCase):
                 )
                 + "\n"
             )
+            (data_dir / "benchmark_suites.json").write_text(
+                json.dumps(
+                    {
+                        "generated_at": "2026-05-14T00:00:00Z",
+                        "suite_root_url": "https://example.test/suites",
+                        "suites": [
+                            {
+                                "name": "torch_models",
+                                "html_url": "https://example.test/torch",
+                                "configs": [
+                                    {
+                                        "path": "sdxl/clip_benchmark_mi325.json",
+                                        "name": "clip_benchmark_mi325.json",
+                                        "kind": "benchmark",
+                                    }
+                                ],
+                            },
+                            {
+                                "name": "sharktank_models",
+                                "html_url": "https://example.test/sharktank",
+                                "configs": [
+                                    {
+                                        "path": "benchmarks/sdxl/clip_rocm.json",
+                                        "name": "clip_rocm.json",
+                                        "kind": "benchmark",
+                                    }
+                                ],
+                            },
+                        ],
+                    }
+                )
+                + "\n"
+            )
 
             data = dashboard.build_dashboard_data(now, lookback_days=7, data_dir=data_dir)
 
@@ -71,6 +104,16 @@ class DashboardDataTest(unittest.TestCase):
         self.assertEqual(point["pr_title"], "Tune SDXL clip dispatch")
         self.assertNotIn("pr_number", point)
         self.assertNotIn("pr_url", point)
+        self.assertEqual(point["suite"], "torch_models")
+        coverage = {row["suite"]: row for row in data["suite_coverage"]}
+        self.assertEqual(coverage["torch_models"]["observed_configured_benchmarks"], 1)
+        self.assertEqual(coverage["torch_models"]["points"], 1)
+        self.assertEqual(coverage["sharktank_models"]["configured_benchmarks"], 1)
+        self.assertEqual(coverage["sharktank_models"]["points"], 0)
+        self.assertEqual(
+            coverage["sharktank_models"]["missing_benchmark_examples"],
+            ["benchmarks/sdxl/clip_rocm.json"],
+        )
 
     def test_dashboard_uses_main_pkgci_test_jobs_and_exact_labels(self):
         dashboard = load_dashboard_module()
@@ -213,6 +256,8 @@ class DashboardDataTest(unittest.TestCase):
             html = (output_dir / "index.html").read_text()
             self.assertIn("Points and raw metric", html)
             self.assertIn("Rolling median", html)
+            self.assertIn("Suite Coverage", html)
+            self.assertIn("renderSuiteCoverage", html)
             self.assertIn("PR title", html)
             self.assertIn("prTitleFromSubject", html)
             self.assertIn("selectedMetricPoints", html)
