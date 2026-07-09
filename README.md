@@ -1,6 +1,6 @@
 # iree-ci-monitor
 
-_Updated: 2026-07-08 11:49 PDT_ — `iree-org/iree`, queue samples last 10h; queued observations up to 3d
+_Updated: 2026-07-08 18:00 PDT_ — `iree-org/iree`, queue samples last 10h; queued observations up to 3d
 
 Automated tracker of GitHub Actions runner health for the IREE project. 
 Each tick, the collector pulls new run+job metadata via the GitHub REST API and the reporter regenerates this page.
@@ -10,12 +10,6 @@ The static benchmark dashboard is generated under [`docs/`](docs/) from PkgCI be
 
 | label | type | jobs | queued | oldest queued | seen | running | p50 queue | p95 queue | main fail rate | runners |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `ah-ubuntu_22_04-c7g_4x-50` | github-hosted | 1 | 0 | — | — | 0 | [1m38s](https://github.com/iree-org/iree/actions/runs/28934106212/job/85840086488) | [1m38s](https://github.com/iree-org/iree/actions/runs/28934106212/job/85840086488) | 0% (0/1) | 1 |
-| `ubuntu-latest` | github-hosted | 6 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/28952072290/job/85901185086) | [4s](https://github.com/iree-org/iree/actions/runs/28952071866/job/85901224808) | — | 6 |
-| `ubuntu-24.04` | github-hosted | 4 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/28951687285/job/85899797652) | [3s](https://github.com/iree-org/iree/actions/runs/28934105523/job/85840084430) | 33% (1/3) | 3 |
-| `macos-15-intel` | github-hosted | 1 | 0 | — | — | 0 | [3s](https://github.com/iree-org/iree/actions/runs/28934083402/job/85840012165) | [3s](https://github.com/iree-org/iree/actions/runs/28934083402/job/85840012165) | 0% (0/1) | 1 |
-| `macos-14` | github-hosted | 1 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/28934088958/job/85840028716) | [2s](https://github.com/iree-org/iree/actions/runs/28934088958/job/85840028716) | 0% (0/1) | 1 |
-| `azure-linux-scale` | ossci | 2 | 0 | — | — | 0 | [1s](https://github.com/iree-org/iree/actions/runs/28934068377/job/85839957917) | [1s](https://github.com/iree-org/iree/actions/runs/28934100372/job/85840066365) | 0% (0/2) | 2 |
 | `Linux,X64,iree-r9700` | self-hosted | 1 | 1 | [57m17s](https://github.com/iree-org/iree/actions/runs/28791438732/job/85372659037) | 2026-07-06 06:33 PDT | 0 | 0s | 0s | — | 0 |
 | `self-hosted,persistent-cache,Linux,X64,threadripper` | self-hosted | 2 | 2 | [57m17s](https://github.com/iree-org/iree/actions/runs/28791438732/job/85372659103) | 2026-07-06 06:33 PDT | 0 | 0s | 0s | — | 0 |
 | `Linux,X64,iree-w7900x2,persistent-cache` | self-hosted | 2 | 2 | [57m17s](https://github.com/iree-org/iree/actions/runs/28791438732/job/85372659129) | 2026-07-06 06:33 PDT | 0 | 0s | 0s | — | 0 |
@@ -63,23 +57,16 @@ The static benchmark dashboard is generated under [`docs/`](docs/) from PkgCI be
 | `.github/workflows/pkgci.yml` | Test Torch / test_torch_ops :: amdgpu_hip_gfx1100_O3 | `Linux,X64,gfx1100` | 1 | 1 | [57m17s](https://github.com/iree-org/iree/actions/runs/28791438732/job/85372659172) | 2026-07-06 06:33 PDT | 0s | 0s | 0s | 0 |
 | `.github/workflows/pkgci.yml` | Test Torch / test_torch_ops :: amdgpu_vulkan_rdna3_O3 | `Linux,X64,rdna3` | 1 | 1 | [57m17s](https://github.com/iree-org/iree/actions/runs/28791438732/job/85372659219) | 2026-07-06 06:33 PDT | 0s | 0s | 0s | 0 |
 | `.github/workflows/pkgci.yml` | Test Torch / test_torch_ops :: amdgpu_hip_gfx1201_O3 | `Linux,X64,gfx1201` | 1 | 1 | [19m09s](https://github.com/iree-org/iree/actions/runs/28865440225/job/85620206069) | 2026-07-07 06:05 PDT | 0s | 0s | 0s | 0 |
-| `.github/workflows/ci_linux_arm64_clang.yml` | linux_arm64_clang | `ah-ubuntu_22_04-c7g_4x-50` | 1 | 0 | — | — | [1m38s](https://github.com/iree-org/iree/actions/runs/28934106212/job/85840086488) | [1m38s](https://github.com/iree-org/iree/actions/runs/28934106212/job/85840086488) | [1m38s](https://github.com/iree-org/iree/actions/runs/28934106212/job/85840086488) | 1 |
-| `dynamic/pages/pages-build-deployment` | deploy | `ubuntu-latest` | 1 | 0 | — | — | [4s](https://github.com/iree-org/iree/actions/runs/28952071866/job/85901224808) | [4s](https://github.com/iree-org/iree/actions/runs/28952071866/job/85901224808) | [4s](https://github.com/iree-org/iree/actions/runs/28952071866/job/85901224808) | 1 |
-| `.github/workflows/ci_linux_x64_clang_byollvm.yml` | linux_x64_clang_byollvm | `ubuntu-24.04` | 1 | 0 | — | — | [3s](https://github.com/iree-org/iree/actions/runs/28934105523/job/85840084430) | [3s](https://github.com/iree-org/iree/actions/runs/28934105523/job/85840084430) | [3s](https://github.com/iree-org/iree/actions/runs/28934105523/job/85840084430) | 1 |
-| `.github/workflows/ci_macos_x64_clang.yml` | macos_x64_clang | `macos-15-intel` | 1 | 0 | — | — | [3s](https://github.com/iree-org/iree/actions/runs/28934083402/job/85840012165) | [3s](https://github.com/iree-org/iree/actions/runs/28934083402/job/85840012165) | [3s](https://github.com/iree-org/iree/actions/runs/28934083402/job/85840012165) | 1 |
-| `.github/workflows/ci_linux_x64_gcc.yml` | linux_x64_gcc | `ubuntu-24.04` | 1 | 0 | — | — | [2s](https://github.com/iree-org/iree/actions/runs/28934118957/job/85840128882) | [2s](https://github.com/iree-org/iree/actions/runs/28934118957/job/85840128882) | [2s](https://github.com/iree-org/iree/actions/runs/28934118957/job/85840128882) | 1 |
-| `.github/workflows/ci_macos_arm64_clang.yml` | macos_arm64_clang | `macos-14` | 1 | 0 | — | — | [2s](https://github.com/iree-org/iree/actions/runs/28934088958/job/85840028716) | [2s](https://github.com/iree-org/iree/actions/runs/28934088958/job/85840028716) | [2s](https://github.com/iree-org/iree/actions/runs/28934088958/job/85840028716) | 1 |
-| `.github/workflows/publish_website.yml` | publish_website | `ubuntu-24.04` | 1 | 0 | — | — | [2s](https://github.com/iree-org/iree/actions/runs/28951687285/job/85899797652) | [2s](https://github.com/iree-org/iree/actions/runs/28951687285/job/85899797652) | [2s](https://github.com/iree-org/iree/actions/runs/28951687285/job/85899797652) | 1 |
 
 ## Self-hosted runners (last 7d)
 
 | runner | labels | jobs | fail rate | running | last seen |
 |---|---|---:|---:|:---:|---:|
-| `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 295 | 3% (9/294) | yes | running |
-| `shark01-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 229 | 1% (3/228) | yes | running |
-| `shark10-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache,shark10-ci`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 250 | 8% (20/249) | yes | running |
-| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64` | 218 | 1% (3/217) | yes | running |
-| `iree-mi308-1` | `nodai-amdgpu-mi308-x86-64` | 70 | 9% (6/70) |  | 19h36m ago |
+| `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 243 | 3% (7/242) | yes | running |
+| `shark01-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 186 | 1% (2/185) | yes | running |
+| `shark10-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache,shark10-ci`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 208 | 7% (14/207) | yes | running |
+| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64` | 177 | 1% (2/176) | yes | running |
+| `iree-mi308-1` | `nodai-amdgpu-mi308-x86-64` | 58 | 10% (6/58) |  | 1d01h ago |
 
 ## Alerts
 
