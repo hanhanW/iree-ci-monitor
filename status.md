@@ -1,13 +1,11 @@
 # Status detail
 
-_Updated: 2026-07-12 11:36 PDT_ — watching `iree-org/iree`, queue samples = last 10h, queued observations = up to 3d
+_Updated: 2026-07-12 17:57 PDT_ — watching `iree-org/iree`, queue samples = last 10h, queued observations = up to 3d
 
 ## Per-label metrics
 
 | label | type | jobs | queued | oldest queued | seen | running | oldest running | avg | p50 | p95 | max | all-jobs fail | main-only fail | runners | SPOF |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|
-| `ubuntu-latest` | github-hosted | 15 | 0 | — | — | 0 | — | 2s | [2s](https://github.com/iree-org/iree/actions/runs/29196476977/job/86660254753) | [3s](https://github.com/iree-org/iree/actions/runs/29196476977/job/86660254756) | [3s](https://github.com/iree-org/iree/actions/runs/29196476977/job/86660254759) | 27% (4/15) | 0% (0/3) | 15 |  |
-| `ubuntu-24.04` | github-hosted | 5 | 0 | — | — | 0 | — | 2s | [2s](https://github.com/iree-org/iree/actions/runs/29190376626/job/86643973793) | [2s](https://github.com/iree-org/iree/actions/runs/29196300805/job/86659773267) | [2s](https://github.com/iree-org/iree/actions/runs/29196300805/job/86659773267) | 0% (0/5) | 0% (0/1) | 5 |  |
 
 ## Longest observed queued jobs (last 3d)
 
@@ -19,16 +17,6 @@ Aggregated by workflow file/name, job name, and exact `runs-on` label set. This 
 
 | workflow | job | labels | type | jobs | queued | oldest queued | seen | running | avg | p50 | p95 | max | runners |
 |---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `dynamic/github-code-scanning/codeql` | Analyze (actions) | `ubuntu-latest` | github-hosted | 3 | 0 | — | — | 0 | 2s | [3s](https://github.com/iree-org/iree/actions/runs/29190570147/job/86644399511) | [3s](https://github.com/iree-org/iree/actions/runs/29194648427/job/86655348210) | [3s](https://github.com/iree-org/iree/actions/runs/29194648427/job/86655348210) | 3 |
-| `dynamic/github-code-scanning/codeql` | Analyze (javascript) | `ubuntu-latest` | github-hosted | 3 | 0 | — | — | 0 | 2s | [3s](https://github.com/iree-org/iree/actions/runs/29194648427/job/86655348214) | [3s](https://github.com/iree-org/iree/actions/runs/29196476977/job/86660254756) | [3s](https://github.com/iree-org/iree/actions/runs/29196476977/job/86660254756) | 3 |
-| `dynamic/github-code-scanning/codeql` | Analyze (python) | `ubuntu-latest` | github-hosted | 3 | 0 | — | — | 0 | 2s | [3s](https://github.com/iree-org/iree/actions/runs/29194648427/job/86655348213) | [3s](https://github.com/iree-org/iree/actions/runs/29196476977/job/86660254759) | [3s](https://github.com/iree-org/iree/actions/runs/29196476977/job/86660254759) | 3 |
-| `dynamic/pages/pages-build-deployment` | deploy | `ubuntu-latest` | github-hosted | 2 | 0 | — | — | 0 | 2s | [2s](https://github.com/iree-org/iree/actions/runs/29196476813/job/86660264248) | [3s](https://github.com/iree-org/iree/actions/runs/29190569888/job/86644414689) | [3s](https://github.com/iree-org/iree/actions/runs/29190569888/job/86644414689) | 2 |
-| `.github/workflows/publish_website.yml` | publish_website | `ubuntu-24.04` | github-hosted | 2 | 0 | — | — | 0 | 2s | [2s](https://github.com/iree-org/iree/actions/runs/29190416411/job/86643984623) | [2s](https://github.com/iree-org/iree/actions/runs/29196300805/job/86659773267) | [2s](https://github.com/iree-org/iree/actions/runs/29196300805/job/86659773267) | 2 |
-| `dynamic/pages/pages-build-deployment` | build | `ubuntu-latest` | github-hosted | 2 | 0 | — | — | 0 | 2s | [2s](https://github.com/iree-org/iree/actions/runs/29190569888/job/86644398529) | [2s](https://github.com/iree-org/iree/actions/runs/29196476813/job/86660254201) | [2s](https://github.com/iree-org/iree/actions/runs/29196476813/job/86660254201) | 2 |
-| `dynamic/pages/pages-build-deployment` | report-build-status | `ubuntu-latest` | github-hosted | 2 | 0 | — | — | 0 | 2s | [2s](https://github.com/iree-org/iree/actions/runs/29190569888/job/86644414684) | [2s](https://github.com/iree-org/iree/actions/runs/29196476813/job/86660264247) | [2s](https://github.com/iree-org/iree/actions/runs/29196476813/job/86660264247) | 2 |
-| `.github/workflows/build_package.yml` | Trigger validate and publish release | `ubuntu-24.04` | github-hosted | 1 | 0 | — | — | 0 | 2s | [2s](https://github.com/iree-org/iree/actions/runs/29182078716/job/86643872977) | [2s](https://github.com/iree-org/iree/actions/runs/29182078716/job/86643872977) | [2s](https://github.com/iree-org/iree/actions/runs/29182078716/job/86643872977) | 1 |
-| `.github/workflows/validate_and_publish_release.yml` | Publish release | `ubuntu-24.04` | github-hosted | 1 | 0 | — | — | 0 | 2s | [2s](https://github.com/iree-org/iree/actions/runs/29190376626/job/86643973793) | [2s](https://github.com/iree-org/iree/actions/runs/29190376626/job/86643973793) | [2s](https://github.com/iree-org/iree/actions/runs/29190376626/job/86643973793) | 1 |
-| `.github/workflows/validate_and_publish_release.yml` | Validate packages | `ubuntu-24.04` | github-hosted | 1 | 0 | — | — | 0 | 2s | [2s](https://github.com/iree-org/iree/actions/runs/29190376626/job/86643881306) | [2s](https://github.com/iree-org/iree/actions/runs/29190376626/job/86643881306) | [2s](https://github.com/iree-org/iree/actions/runs/29190376626/job/86643881306) | 1 |
 
 ## Per-runner metrics (self-hosted, last 7d)
 
@@ -36,11 +24,11 @@ Only runners that served at least one label with ≤ 15 distinct runners in the 
 
 | runner | labels | jobs | ok | fail | cancelled | fail rate | running | last seen |
 |---|---|---:|---:|---:|---:|---:|:---:|---:|
-| `shark10-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache,shark10-ci`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 159 | 146 | 11 | 1 | 7% | yes | running |
-| `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 202 | 196 | 3 | 2 | 1% | yes | running |
-| `shark01-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 162 | 158 | 1 | 2 | 1% | yes | running |
-| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64` | 150 | 148 | 1 | 0 | 1% | yes | running |
-| `iree-mi308-1` | `nodai-amdgpu-mi308-x86-64` | 47 | 41 | 5 | 1 | 11% |  | 2d06h ago |
+| `shark10-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache,shark10-ci`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 154 | 141 | 11 | 1 | 7% | yes | running |
+| `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 198 | 192 | 3 | 2 | 2% | yes | running |
+| `shark01-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,iree-w7900`, `Linux,X64,iree-w7900x2,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64`, `self-hosted,persistent-cache,Linux,X64,threadripper` | 159 | 155 | 1 | 2 | 1% | yes | running |
+| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64` | 147 | 145 | 1 | 0 | 1% | yes | running |
+| `iree-mi308-1` | `nodai-amdgpu-mi308-x86-64` | 46 | 40 | 5 | 1 | 11% |  | 2d13h ago |
 
 ## Alerts
 
