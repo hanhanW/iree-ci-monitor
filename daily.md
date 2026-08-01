@@ -1,6 +1,6 @@
 # Daily report — 2026-07-31 (Friday)
 
-_Updated: 2026-08-01 05:37 PDT_ — `iree-org/iree`, covering `2026-07-31 00:00 PDT` → `2026-08-01 00:00 PDT` (Pacific calendar day **2026-07-31 (Friday)**)
+_Updated: 2026-08-01 11:37 PDT_ — `iree-org/iree`, covering `2026-07-31 00:00 PDT` → `2026-08-01 00:00 PDT` (Pacific calendar day **2026-07-31 (Friday)**)
 
 Snapshot of the most recently completed Pacific calendar day. Larger window than the rolling [`status.md`](status.md) — better percentile stability and small-volume labels can reach the failure-rate threshold. Refreshed each tick; content only changes when crossing midnight Pacific time, so most ticks produce no diff.
 
@@ -29,13 +29,13 @@ Snapshot of the most recently completed Pacific calendar day. Larger window than
 | `ubuntu-latest` | github-hosted | 48 | 48 | [3s](https://github.com/iree-org/iree/actions/runs/30627240079/job/91145234884) | [9s](https://github.com/iree-org/iree/actions/runs/30656239008/job/91241203421) | [10s](https://github.com/iree-org/iree/actions/runs/30655580003/job/91239010045) | 17% (8/48) | 0% (0/15) | 48 |  |
 | `azure-windows-scale` | ossci | 10 | 10 | [1s](https://github.com/iree-org/iree/actions/runs/30646845660/job/91215449050) | [8s](https://github.com/iree-org/iree/actions/runs/30658666818/job/91249361290) | [8s](https://github.com/iree-org/iree/actions/runs/30658666818/job/91249361290) | 10% (1/10) | 0% (0/5) | 10 |  |
 | `macos-15-intel` | github-hosted | 1 | 1 | [3s](https://github.com/iree-org/iree/actions/runs/30622369603/job/91129661042) | [3s](https://github.com/iree-org/iree/actions/runs/30622369603/job/91129661042) | [3s](https://github.com/iree-org/iree/actions/runs/30622369603/job/91129661042) | 0% (0/1) | 0% (0/1) | 1 |  |
-| `linux-mi325-1gpu-ossci-iree-org` | ossci | 9 | 3 | 0s | 0s | 0s | 0% (0/3) | 0% (0/2) | 0 |  |
+| `linux-mi325-1gpu-ossci-iree-org` | ossci | 9 | 5 | 0s | 0s | 0s | 0% (0/5) | 0% (0/2) | 0 |  |
 
 ## Workflow/job waiting time
 
 | workflow | job | labels | jobs | completed | p50 queue | p95 queue | max queue | runners |
 |---|---|---|---:|---:|---:|---:|---:|---:|
-| `.github/workflows/pkgci.yml` | Test AMD MI325 / test_mi325 | `linux-mi325-1gpu-ossci-iree-org` | 9 | 3 | 0s | 0s | 0s | 0 |
+| `.github/workflows/pkgci.yml` | Test AMD MI325 / test_mi325 | `linux-mi325-1gpu-ossci-iree-org` | 9 | 5 | 0s | 0s | 0s | 0 |
 | `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: amdgpu_hip_rdna4 | `Linux,X64,gfx1201,persistent-cache` | 9 | 9 | [15m53s](https://github.com/iree-org/iree/actions/runs/30646844543/job/91217330220) | [58m44s](https://github.com/iree-org/iree/actions/runs/30658666350/job/91251264408) | [58m44s](https://github.com/iree-org/iree/actions/runs/30658666350/job/91251264408) | 1 |
 | `.github/workflows/pkgci.yml` | Test AMD R9700 / test_r9700 | `Linux,X64,iree-r9700` | 9 | 9 | [8m11s](https://github.com/iree-org/iree/actions/runs/30646568869/job/91217783675) | [55m44s](https://github.com/iree-org/iree/actions/runs/30658666350/job/91251264186) | [55m44s](https://github.com/iree-org/iree/actions/runs/30658666350/job/91251264186) | 1 |
 | `.github/workflows/pkgci.yml` | Test Torch / test_torch_ops :: amdgpu_hip_gfx1201_O3 | `Linux,X64,gfx1201` | 9 | 9 | [17m28s](https://github.com/iree-org/iree/actions/runs/30655580496/job/91241055655) | [54m28s](https://github.com/iree-org/iree/actions/runs/30658666350/job/91251264326) | [54m28s](https://github.com/iree-org/iree/actions/runs/30658666350/job/91251264326) | 1 |
