@@ -1,6 +1,6 @@
 # Daily report — 2026-08-03 (Monday)
 
-_Updated: 2026-08-04 05:59 PDT_ — `iree-org/iree`, covering `2026-08-03 00:00 PDT` → `2026-08-04 00:00 PDT` (Pacific calendar day **2026-08-03 (Monday)**)
+_Updated: 2026-08-04 11:51 PDT_ — `iree-org/iree`, covering `2026-08-03 00:00 PDT` → `2026-08-04 00:00 PDT` (Pacific calendar day **2026-08-03 (Monday)**)
 
 Snapshot of the most recently completed Pacific calendar day. Larger window than the rolling [`status.md`](status.md) — better percentile stability and small-volume labels can reach the failure-rate threshold. Refreshed each tick; content only changes when crossing midnight Pacific time, so most ticks produce no diff.
 
@@ -29,13 +29,12 @@ Snapshot of the most recently completed Pacific calendar day. Larger window than
 | `macos-15-intel` | github-hosted | 1 | 1 | [3s](https://github.com/iree-org/iree/actions/runs/30805663080/job/91660323617) | [3s](https://github.com/iree-org/iree/actions/runs/30805663080/job/91660323617) | [3s](https://github.com/iree-org/iree/actions/runs/30805663080/job/91660323617) | 0% (0/1) | 0% (0/1) | 1 |  |
 | `Linux,X64,iree-w7900` | self-hosted | 2 | 2 | [2s](https://github.com/iree-org/iree/actions/runs/30798185758/job/91644715224) | [2s](https://github.com/iree-org/iree/actions/runs/30815414228/job/91694209242) | [2s](https://github.com/iree-org/iree/actions/runs/30815414228/job/91694209242) | 0% (0/2) | — | 2 |  |
 | `azure-windows-scale` | ossci | 2 | 2 | [0s](https://github.com/iree-org/iree/actions/runs/30815414300/job/91691903678) | [0s](https://github.com/iree-org/iree/actions/runs/30815414300/job/91691903678) | [0s](https://github.com/iree-org/iree/actions/runs/30815414300/job/91691903678) | 50% (1/2) | — | 2 |  |
-| `linux-mi325-1gpu-ossci-iree-org` | ossci | 2 | 1 | 0s | 0s | 0s | 0% (0/1) | — | 0 |  |
+| `linux-mi325-1gpu-ossci-iree-org` | ossci | 2 | 2 | 0s | 0s | 0s | 0% (0/2) | — | 0 |  |
 
 ## Workflow/job waiting time
 
 | workflow | job | labels | jobs | completed | p50 queue | p95 queue | max queue | runners |
 |---|---|---|---:|---:|---:|---:|---:|---:|
-| `.github/workflows/pkgci.yml` | Test AMD MI325 / test_mi325 | `linux-mi325-1gpu-ossci-iree-org` | 2 | 1 | 0s | 0s | 0s | 0 |
 | `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_ops :: amdgpu_hip_rdna4_O3 | `Linux,X64,gfx1201` | 2 | 2 | [21m26s](https://github.com/iree-org/iree/actions/runs/30815414228/job/91694209506) | [28m52s](https://github.com/iree-org/iree/actions/runs/30798185758/job/91644715579) | [28m52s](https://github.com/iree-org/iree/actions/runs/30798185758/job/91644715579) | 1 |
 | `.github/workflows/pkgci.yml` | Test Torch / torch_models tests :: cpu_task | `self-hosted,persistent-cache,Linux,X64,threadripper` | 2 | 2 | [6m46s](https://github.com/iree-org/iree/actions/runs/30798185758/job/91644715313) | [23m08s](https://github.com/iree-org/iree/actions/runs/30815414228/job/91694209390) | [23m08s](https://github.com/iree-org/iree/actions/runs/30815414228/job/91694209390) | 1 |
 | `.github/workflows/pkgci.yml` | Test Sharktank / sharktank_model_tests :: rocm_hip_w7900 | `Linux,X64,iree-w7900x2,persistent-cache` | 2 | 2 | [14m05s](https://github.com/iree-org/iree/actions/runs/30815414228/job/91694209383) | [22m58s](https://github.com/iree-org/iree/actions/runs/30798185758/job/91644715320) | [22m58s](https://github.com/iree-org/iree/actions/runs/30798185758/job/91644715320) | 2 |
@@ -75,6 +74,7 @@ Snapshot of the most recently completed Pacific calendar day. Larger window than
 | `.github/workflows/clang_tidy.yml` | clang-tidy | `ubuntu-24.04` | 2 | 2 | [3s](https://github.com/iree-org/iree/actions/runs/30815413795/job/91691835744) | [8s](https://github.com/iree-org/iree/actions/runs/30798185350/job/91636454655) | [8s](https://github.com/iree-org/iree/actions/runs/30798185350/job/91636454655) | 2 |
 | `.github/workflows/lint.yml` | pre-commit | `ubuntu-24.04` | 2 | 2 | [8s](https://github.com/iree-org/iree/actions/runs/30798185839/job/91636455408) | [8s](https://github.com/iree-org/iree/actions/runs/30815413996/job/91691836241) | [8s](https://github.com/iree-org/iree/actions/runs/30815413996/job/91691836241) | 2 |
 | `dynamic/pages/pages-build-deployment` | build | `ubuntu-latest` | 2 | 2 | [2s](https://github.com/iree-org/iree/actions/runs/30809739386/job/91673395841) | [8s](https://github.com/iree-org/iree/actions/runs/30826032709/job/91727777172) | [8s](https://github.com/iree-org/iree/actions/runs/30826032709/job/91727777172) | 2 |
+| `dynamic/pages/pages-build-deployment` | report-build-status | `ubuntu-latest` | 2 | 2 | [8s](https://github.com/iree-org/iree/actions/runs/30809739386/job/91673430052) | [8s](https://github.com/iree-org/iree/actions/runs/30826032709/job/91727853468) | [8s](https://github.com/iree-org/iree/actions/runs/30826032709/job/91727853468) | 2 |
 
 ## Methodology
 
