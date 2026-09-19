@@ -1,6 +1,6 @@
 # Daily report — 2026-09-18 (Friday)
 
-_Updated: 2026-09-19 04:06 PDT_ — `iree-org/iree`, covering `2026-09-18 00:00 PDT` → `2026-09-19 00:00 PDT` (Pacific calendar day **2026-09-18 (Friday)**)
+_Updated: 2026-09-19 08:56 PDT_ — `iree-org/iree`, covering `2026-09-18 00:00 PDT` → `2026-09-19 00:00 PDT` (Pacific calendar day **2026-09-18 (Friday)**)
 
 Snapshot of the most recently completed Pacific calendar day. Larger window than the rolling [`status.md`](status.md) — better percentile stability and small-volume labels can reach the failure-rate threshold. Refreshed each tick; content only changes when crossing midnight Pacific time, so most ticks produce no diff.
 
@@ -23,15 +23,15 @@ Snapshot of the most recently completed Pacific calendar day. Larger window than
 | `azure-linux-scale` | ossci | 71 | 71 | [9s](https://github.com/iree-org/iree/actions/runs/35416725131/job/105826729175) | [2m35s](https://github.com/iree-org/iree/actions/runs/35322331365/job/105529477907) | [3m22s](https://github.com/iree-org/iree/actions/runs/35360870368/job/105651921661) | 6% (4/71) | 0% (0/21) | 71 |  |
 | `ah-ubuntu_22_04-c7g_4x-50` | github-hosted | 1 | 1 | [1m27s](https://github.com/iree-org/iree/actions/runs/35329565578/job/105550511911) | [1m27s](https://github.com/iree-org/iree/actions/runs/35329565578/job/105550511911) | [1m27s](https://github.com/iree-org/iree/actions/runs/35329565578/job/105550511911) | 100% (1/1) | 100% (1/1) | 1 |  |
 | `ubuntu-latest` | github-hosted | 63 | 63 | [2s](https://github.com/iree-org/iree/actions/runs/35416724856/job/105826702960) | [4s](https://github.com/iree-org/iree/actions/runs/35360867933/job/105651510756) | [7s](https://github.com/iree-org/iree/actions/runs/35360867933/job/105651510635) | 10% (6/63) | 0% (0/9) | 63 |  |
-| `Linux,X64,rdna3,persistent-cache,shark10-ci` | self-hosted | 13 | 6 | 0s | 0s | 0s | 0% (0/6) | 0% (0/2) | 0 | yes |
-| `Linux,X64,iree-w7900` | self-hosted | 13 | 6 | 0s | 0s | 0s | 0% (0/6) | 0% (0/2) | 0 |  |
+| `Linux,X64,rdna3,persistent-cache,shark10-ci` | self-hosted | 13 | 11 | 0s | 0s | 0s | 0% (0/11) | 0% (0/2) | 0 | yes |
+| `Linux,X64,iree-w7900` | self-hosted | 13 | 11 | 0s | 0s | 0s | 0% (0/11) | 0% (0/2) | 0 |  |
 
 ## Workflow/job waiting time
 
 | workflow | job | labels | jobs | completed | p50 queue | p95 queue | max queue | runners |
 |---|---|---|---:|---:|---:|---:|---:|---:|
-| `.github/workflows/pkgci.yml` | Test AMD W7900 / test_w7900 | `Linux,X64,iree-w7900` | 13 | 6 | 0s | 0s | 0s | 0 |
-| `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: amdgpu_vulkan_rdna3 | `Linux,X64,rdna3,persistent-cache,shark10-ci` | 13 | 6 | 0s | 0s | 0s | 0 |
+| `.github/workflows/pkgci.yml` | Test AMD W7900 / test_w7900 | `Linux,X64,iree-w7900` | 13 | 11 | 0s | 0s | 0s | 0 |
+| `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: amdgpu_vulkan_rdna3 | `Linux,X64,rdna3,persistent-cache,shark10-ci` | 13 | 11 | 0s | 0s | 0s | 0 |
 | `.github/workflows/pkgci.yml` | Test Torch / test_torch_ops :: amdgpu_vulkan_rdna3_O3 | `Linux,X64,rdna3` | 13 | 13 | [2h13m](https://github.com/iree-org/iree/actions/runs/35358845541/job/105647952443) | [3h19m](https://github.com/iree-org/iree/actions/runs/35322331181/job/105530601777) | [3h29m](https://github.com/iree-org/iree/actions/runs/35322323117/job/105529520015) | 1 |
 | `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_ops :: amdgpu_hip_rdna3_O3 | `Linux,X64,gfx1100` | 13 | 13 | [1h31m](https://github.com/iree-org/iree/actions/runs/35322330390/job/105531038461) | [2h44m](https://github.com/iree-org/iree/actions/runs/35360870302/job/105655841179) | [3h08m](https://github.com/iree-org/iree/actions/runs/35322323117/job/105529519963) | 1 |
 | `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_ops :: amdgpu_hip_rdna4_O3 | `Linux,X64,gfx1201` | 13 | 13 | [1h23m](https://github.com/iree-org/iree/actions/runs/35322330390/job/105531038586) | [2h38m](https://github.com/iree-org/iree/actions/runs/35322331231/job/105530927150) | [2h55m](https://github.com/iree-org/iree/actions/runs/35322331181/job/105530601671) | 1 |
