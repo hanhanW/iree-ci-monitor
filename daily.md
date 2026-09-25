@@ -1,6 +1,6 @@
 # Daily report — 2026-09-23 (Wednesday)
 
-_Updated: 2026-09-24 14:34 PDT_ — `iree-org/iree`, covering `2026-09-23 00:00 PDT` → `2026-09-24 00:00 PDT` (Pacific calendar day **2026-09-23 (Wednesday)**)
+_Updated: 2026-09-24 22:02 PDT_ — `iree-org/iree`, covering `2026-09-23 00:00 PDT` → `2026-09-24 00:00 PDT` (Pacific calendar day **2026-09-23 (Wednesday)**)
 
 Snapshot of the most recently completed Pacific calendar day. Larger window than the rolling [`status.md`](status.md) — better percentile stability and small-volume labels can reach the failure-rate threshold. Refreshed each tick; content only changes when crossing midnight Pacific time, so most ticks produce no diff.
 
@@ -9,9 +9,9 @@ Snapshot of the most recently completed Pacific calendar day. Larger window than
 | label | type | jobs | completed | p50 queue | p95 queue | max queue | all-jobs fail | main-only fail | runners | SPOF |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|:---:|
 | `Linux,X64,gfx1201` | self-hosted | 36 | 36 | [57m52s](https://github.com/iree-org/iree/actions/runs/35829786411/job/107155742892) | [2h24m](https://github.com/iree-org/iree/actions/runs/35841024182/job/107118911561) | [2h33m](https://github.com/iree-org/iree/actions/runs/35841023154/job/107119218886) | 3% (1/36) | 0% (0/2) | 1 | yes |
-| `Linux,X64,gfx1100,persistent-cache` | self-hosted | 18 | 18 | [1h02m](https://github.com/iree-org/iree/actions/runs/35910508215/job/107369932915) | [2h16m](https://github.com/iree-org/iree/actions/runs/35860366221/job/107190663829) | [2h20m](https://github.com/iree-org/iree/actions/runs/35860366459/job/107190315493) | 0% (0/18) | 0% (0/1) | 1 |  |
-| `Linux,X64,gfx1100` | self-hosted | 36 | 36 | [37m41s](https://github.com/iree-org/iree/actions/runs/35897930861/job/107314101957) | [2h16m](https://github.com/iree-org/iree/actions/runs/35860367805/job/107192888880) | [2h56m](https://github.com/iree-org/iree/actions/runs/35841023120/job/107119197444) | 3% (1/36) | 0% (0/2) | 1 |  |
-| `Linux,X64,rdna3` | self-hosted | 36 | 36 | [44m18s](https://github.com/iree-org/iree/actions/runs/35860367806/job/107184135088) | [2h16m](https://github.com/iree-org/iree/actions/runs/35860366459/job/107190315269) | [3h06m](https://github.com/iree-org/iree/actions/runs/35841023120/job/107119197636) | 3% (1/36) | 0% (0/2) | 1 |  |
+| `Linux,X64,gfx1100,persistent-cache` | self-hosted | 18 | 18 | [1h02m](https://github.com/iree-org/iree/actions/runs/35910508215/job/107369932915) | [2h16m](https://github.com/iree-org/iree/actions/runs/35860366221/job/107190663829) | [2h20m](https://github.com/iree-org/iree/actions/runs/35860366459/job/107190315493) | 0% (0/18) | 0% (0/1) | 1 | yes |
+| `Linux,X64,gfx1100` | self-hosted | 36 | 36 | [37m41s](https://github.com/iree-org/iree/actions/runs/35897930861/job/107314101957) | [2h16m](https://github.com/iree-org/iree/actions/runs/35860367805/job/107192888880) | [2h56m](https://github.com/iree-org/iree/actions/runs/35841023120/job/107119197444) | 3% (1/36) | 0% (0/2) | 1 | yes |
+| `Linux,X64,rdna3` | self-hosted | 36 | 36 | [44m18s](https://github.com/iree-org/iree/actions/runs/35860367806/job/107184135088) | [2h16m](https://github.com/iree-org/iree/actions/runs/35860366459/job/107190315269) | [3h06m](https://github.com/iree-org/iree/actions/runs/35841023120/job/107119197636) | 3% (1/36) | 0% (0/2) | 1 | yes |
 | `self-hosted,persistent-cache,Linux,X64` | self-hosted | 36 | 36 | [31m07s](https://github.com/iree-org/iree/actions/runs/35910508653/job/107352869075) | [1h59m](https://github.com/iree-org/iree/actions/runs/35860366459/job/107190315170) | [2h28m](https://github.com/iree-org/iree/actions/runs/35841023154/job/107119219162) | 0% (0/36) | 0% (0/2) | 2 |  |
 | `Linux,X64,rdna3,persistent-cache` | self-hosted | 18 | 18 | [35m48s](https://github.com/iree-org/iree/actions/runs/35900607075/job/107322248439) | [1h44m](https://github.com/iree-org/iree/actions/runs/35860366221/job/107190663967) | [1h48m](https://github.com/iree-org/iree/actions/runs/35860367805/job/107192888732) | 0% (0/18) | 0% (0/1) | 1 | yes |
 | `Linux,X64,iree-r9700` | self-hosted | 18 | 18 | [23m02s](https://github.com/iree-org/iree/actions/runs/35897930861/job/107314101619) | [1h06m](https://github.com/iree-org/iree/actions/runs/35910508653/job/107352868446) | [1h19m](https://github.com/iree-org/iree/actions/runs/35860367805/job/107192888553) | 22% (4/18) | 0% (0/1) | 1 | yes |
@@ -24,7 +24,7 @@ Snapshot of the most recently completed Pacific calendar day. Larger window than
 | `ubuntu-24.04` | github-hosted | 477 | 477 | [16s](https://github.com/iree-org/iree/actions/runs/35860366221/job/107190663872) | [6m00s](https://github.com/iree-org/iree/actions/runs/35841023084/job/107116210513) | [10m04s](https://github.com/iree-org/iree/actions/runs/35860367746/job/107180221061) | 11% (54/477) | 0% (0/27) | 424 |  |
 | `ah-ubuntu_22_04-c7g_4x-50` | github-hosted | 1 | 1 | [1m31s](https://github.com/iree-org/iree/actions/runs/35843042550/job/107122453793) | [1m31s](https://github.com/iree-org/iree/actions/runs/35843042550/job/107122453793) | [1m31s](https://github.com/iree-org/iree/actions/runs/35843042550/job/107122453793) | 100% (1/1) | 100% (1/1) | 1 |  |
 | `ubuntu-latest` | github-hosted | 87 | 87 | [2s](https://github.com/iree-org/iree/actions/runs/35897924646/job/107306413168) | [59s](https://github.com/iree-org/iree/actions/runs/35860362240/job/107178794415) | [3m00s](https://github.com/iree-org/iree/actions/runs/35860363235/job/107178798384) | 5% (4/87) | 0% (0/3) | 87 |  |
-| `Linux,X64,iree-w7900` | self-hosted | 18 | 0 | 0s | 0s | 0s | — | — | 0 | yes |
+| `Linux,X64,iree-w7900` | self-hosted | 18 | 0 | 0s | 0s | 0s | — | — | 0 |  |
 
 ## Workflow/job waiting time
 
