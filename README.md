@@ -1,6 +1,6 @@
 # iree-ci-monitor
 
-_Updated: 2026-09-28 16:19 PDT_ — `iree-org/iree`, queue samples last 10h; queued observations up to 3d
+_Updated: 2026-09-28 22:48 PDT_ — `iree-org/iree`, queue samples last 10h; queued observations up to 3d
 
 Automated tracker of GitHub Actions runner health for the IREE project. 
 Each tick, the collector pulls new run+job metadata via the GitHub REST API and the reporter regenerates this page.
@@ -18,12 +18,12 @@ The static benchmark dashboard is generated under [`docs/`](docs/) from PkgCI be
 | `Linux,X64,iree-r9700` | self-hosted | 1 | 0 | — | — | 0 | [7m41s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279678) | [7m41s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279678) | — | `shark75-ci` |
 | `Linux,X64,gfx1100,persistent-cache` | self-hosted | 1 | 0 | — | — | 0 | [5m39s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279806) | [5m39s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279806) | — | `shark55-ci` |
 | `Linux,X64,gfx1201,persistent-cache` | self-hosted | 1 | 0 | — | — | 0 | [5m12s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279889) | [5m12s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279889) | — | `shark75-ci` |
-| `macos-14` | github-hosted | 3 | 0 | — | — | 0 | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833213) | [10s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833284) | — | 3 |
+| `macos-14` | github-hosted | 5 | 0 | — | — | 1 | [9s](https://github.com/iree-org/iree/actions/runs/36525474826/job/109267491596) | [10s](https://github.com/iree-org/iree/actions/runs/36525474826/job/109267491612) | — | 5 |
 | `azure-linux-scale` | ossci | 5 | 0 | — | — | 0 | [8s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833802) | [8s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109151842539) | — | 5 |
-| `ubuntu-24.04-arm` | github-hosted | 3 | 0 | — | — | 0 | [5s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833216) | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833242) | — | 3 |
-| `ubuntu-latest` | github-hosted | 13 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/36451633964/job/109027571212) | [4s](https://github.com/iree-org/iree/actions/runs/36451633678/job/109027571578) | 0% (0/1) | 13 |
-| `ubuntu-24.04` | github-hosted | 24 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279981) | [3s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279939) | 50% (1/2) | 23 |
-| `windows-2022` | github-hosted | 3 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833146) | [2s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833147) | — | 3 |
+| `ubuntu-24.04-arm` | github-hosted | 6 | 0 | — | — | 2 | [5s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833216) | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833242) | — | 6 |
+| `windows-2022` | github-hosted | 5 | 0 | — | — | 1 | [2s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833147) | [5s](https://github.com/iree-org/iree/actions/runs/36525474826/job/109267491781) | — | 5 |
+| `ubuntu-24.04` | github-hosted | 31 | 0 | — | — | 3 | [2s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154280105) | [3s](https://github.com/iree-org/iree/actions/runs/36525474826/job/109267491726) | 0% (0/4) | 30 |
+| `ubuntu-latest` | github-hosted | 1 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/36487914000/job/109149219507) | [2s](https://github.com/iree-org/iree/actions/runs/36487914000/job/109149219507) | 0% (0/1) | 1 |
 | `azure-windows-scale` | ossci | 1 | 0 | — | — | 0 | [1s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833775) | [1s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833775) | — | 1 |
 | `Linux,X64,iree-w7900` | self-hosted | 1 | 0 | — | — | 0 | 0s | 0s | — | 0 |
 
@@ -45,7 +45,9 @@ _No queued jobs observed._
 | `.github/workflows/pkgci.yml` | Test AMD R9700 / test_r9700 | `Linux,X64,iree-r9700` | 1 | 0 | — | — | [7m41s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279678) | [7m41s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279678) | [7m41s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279678) | 1 |
 | `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: amdgpu_hip_rdna3 | `Linux,X64,gfx1100,persistent-cache` | 1 | 0 | — | — | [5m39s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279806) | [5m39s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279806) | [5m39s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279806) | 1 |
 | `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: amdgpu_hip_rdna4 | `Linux,X64,gfx1201,persistent-cache` | 1 | 0 | — | — | [5m12s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279889) | [5m12s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279889) | [5m12s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109154279889) | 1 |
+| `.github/workflows/build_package.yml` | macos :: Build py-compiler-pkg Package | `macos-14` | 1 | 0 | — | — | [10s](https://github.com/iree-org/iree/actions/runs/36525474826/job/109267491612) | [10s](https://github.com/iree-org/iree/actions/runs/36525474826/job/109267491612) | [10s](https://github.com/iree-org/iree/actions/runs/36525474826/job/109267491612) | 1 |
 | `.github/workflows/ci.yml` | runtime_tracing :: macos-14 :: console | `macos-14` | 1 | 0 | — | — | [10s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833284) | [10s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833284) | [10s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833284) | 1 |
+| `.github/workflows/build_package.yml` | macos :: Build py-runtime-pkg Package | `macos-14` | 1 | 0 | — | — | [9s](https://github.com/iree-org/iree/actions/runs/36525474826/job/109267491596) | [9s](https://github.com/iree-org/iree/actions/runs/36525474826/job/109267491596) | [9s](https://github.com/iree-org/iree/actions/runs/36525474826/job/109267491596) | 1 |
 | `.github/workflows/ci.yml` | linux_x64_clang_asan / linux_x64_clang_asan | `azure-linux-scale` | 1 | 0 | — | — | [8s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833948) | [8s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833948) | [8s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833948) | 1 |
 | `.github/workflows/ci.yml` | linux_x64_clang_ubsan / linux_x64_clang_ubsan | `azure-linux-scale` | 1 | 0 | — | — | [8s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833802) | [8s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833802) | [8s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833802) | 1 |
 | `.github/workflows/pkgci.yml` | Build Packages / Linux Release (x86_64) | `azure-linux-scale` | 1 | 0 | — | — | [8s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109151842539) | [8s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109151842539) | [8s](https://github.com/iree-org/iree/actions/runs/36488686361/job/109151842539) | 1 |
@@ -53,15 +55,13 @@ _No queued jobs observed._
 | `.github/workflows/ci.yml` | runtime :: macos-14 | `macos-14` | 1 | 0 | — | — | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833105) | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833105) | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833105) | 1 |
 | `.github/workflows/ci.yml` | runtime_tracing :: macos-14 :: tracy | `macos-14` | 1 | 0 | — | — | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833213) | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833213) | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833213) | 1 |
 | `.github/workflows/ci.yml` | runtime_tracing :: ubuntu-24.04-arm :: console | `ubuntu-24.04-arm` | 1 | 0 | — | — | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833242) | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833242) | [6s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833242) | 1 |
-| `.github/workflows/ci.yml` | runtime :: ubuntu-24.04-arm | `ubuntu-24.04-arm` | 1 | 0 | — | — | [5s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151832987) | [5s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151832987) | [5s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151832987) | 1 |
-| `.github/workflows/ci.yml` | runtime_tracing :: ubuntu-24.04-arm :: tracy | `ubuntu-24.04-arm` | 1 | 0 | — | — | [5s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833216) | [5s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833216) | [5s](https://github.com/iree-org/iree/actions/runs/36488686101/job/109151833216) | 1 |
 
 ## Self-hosted runners (last 7d)
 
 | runner | labels | jobs | fail rate | running | last seen |
 |---|---|---:|---:|:---:|---:|
-| `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 254 | 4% (10/254) |  | 54m53s ago |
-| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache`, `self-hosted,persistent-cache,Linux,X64` | 339 | 1% (5/339) |  | 58m41s ago |
+| `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 239 | 4% (10/239) |  | 7h23m ago |
+| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `Linux,X64,rdna3,persistent-cache`, `self-hosted,persistent-cache,Linux,X64` | 319 | 1% (4/319) |  | 7h27m ago |
 
 ## Alerts
 
