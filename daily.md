@@ -1,6 +1,6 @@
 # Daily report — 2026-10-02 (Friday)
 
-_Updated: 2026-10-03 14:22 PDT_ — `iree-org/iree`, covering `2026-10-02 00:00 PDT` → `2026-10-03 00:00 PDT` (Pacific calendar day **2026-10-02 (Friday)**)
+_Updated: 2026-10-03 22:59 PDT_ — `iree-org/iree`, covering `2026-10-02 00:00 PDT` → `2026-10-03 00:00 PDT` (Pacific calendar day **2026-10-02 (Friday)**)
 
 Snapshot of the most recently completed Pacific calendar day. Larger window than the rolling [`status.md`](status.md) — better percentile stability and small-volume labels can reach the failure-rate threshold. Refreshed each tick; content only changes when crossing midnight Pacific time, so most ticks produce no diff.
 
@@ -20,22 +20,22 @@ Snapshot of the most recently completed Pacific calendar day. Larger window than
 | `ubuntu-24.04-arm` | github-hosted | 36 | 36 | [5s](https://github.com/iree-org/iree/actions/runs/37031857283/job/110920525591) | [43s](https://github.com/iree-org/iree/actions/runs/37031842404/job/110920408642) | [1m10s](https://github.com/iree-org/iree/actions/runs/37101946668/job/111143090053) | 6% (2/36) | 0% (0/6) | 36 |  |
 | `azure-windows-scale` | ossci | 11 | 11 | [1s](https://github.com/iree-org/iree/actions/runs/37072908788/job/111056756931) | [27s](https://github.com/iree-org/iree/actions/runs/37031857283/job/110920526195) | [27s](https://github.com/iree-org/iree/actions/runs/37031857283/job/110920526195) | 0% (0/11) | 0% (0/2) | 11 |  |
 | `ubuntu-latest` | github-hosted | 24 | 24 | [2s](https://github.com/iree-org/iree/actions/runs/37034032383/job/110927677313) | [3s](https://github.com/iree-org/iree/actions/runs/37067817809/job/111039889170) | [5s](https://github.com/iree-org/iree/actions/runs/37031840786/job/110920334341) | 0% (0/24) | 0% (0/6) | 24 |  |
-| `Linux,X64,gfx1100,persistent-cache` | self-hosted | 10 | 7 | 0s | 0s | 0s | 0% (0/7) | 0% (0/1) | 0 | yes |
-| `Linux,X64,gfx1100` | self-hosted | 20 | 14 | 0s | 0s | 0s | 0% (0/14) | 0% (0/2) | 0 | yes |
-| `Linux,X64,rdna3` | self-hosted | 20 | 14 | 0s | 0s | 0s | 0% (0/14) | 0% (0/2) | 0 | yes |
-| `Linux,X64,rdna3,persistent-cache` | self-hosted | 10 | 7 | 0s | 0s | 0s | 0% (0/7) | 0% (0/1) | 0 | yes |
+| `Linux,X64,gfx1100,persistent-cache` | self-hosted | 10 | 9 | 0s | 0s | 0s | 0% (0/9) | 0% (0/2) | 0 | yes |
+| `Linux,X64,gfx1100` | self-hosted | 20 | 18 | 0s | 0s | 0s | 0% (0/18) | 0% (0/4) | 0 | yes |
+| `Linux,X64,rdna3` | self-hosted | 20 | 18 | 0s | 0s | 0s | 0% (0/18) | 0% (0/4) | 0 | yes |
+| `Linux,X64,rdna3,persistent-cache` | self-hosted | 10 | 9 | 0s | 0s | 0s | 0% (0/9) | 0% (0/2) | 0 | yes |
 | `Linux,X64,iree-w7900` | self-hosted | 10 | 0 | 0s | 0s | 0s | — | — | 0 |  |
 
 ## Workflow/job waiting time
 
 | workflow | job | labels | jobs | completed | p50 queue | p95 queue | max queue | runners |
 |---|---|---|---:|---:|---:|---:|---:|---:|
-| `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: amdgpu_hip_rdna3 | `Linux,X64,gfx1100,persistent-cache` | 10 | 7 | 0s | 0s | 0s | 0 |
-| `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: amdgpu_vulkan_rdna3 | `Linux,X64,rdna3,persistent-cache` | 10 | 7 | 0s | 0s | 0s | 0 |
-| `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_ops :: amdgpu_hip_rdna3_O3 | `Linux,X64,gfx1100` | 10 | 7 | 0s | 0s | 0s | 0 |
-| `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_ops :: amdgpu_vulkan_rdna3_O0 | `Linux,X64,rdna3` | 10 | 7 | 0s | 0s | 0s | 0 |
-| `.github/workflows/pkgci.yml` | Test Torch / test_torch_ops :: amdgpu_hip_gfx1100_O3 | `Linux,X64,gfx1100` | 10 | 7 | 0s | 0s | 0s | 0 |
-| `.github/workflows/pkgci.yml` | Test Torch / test_torch_ops :: amdgpu_vulkan_rdna3_O3 | `Linux,X64,rdna3` | 10 | 7 | 0s | 0s | 0s | 0 |
+| `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: amdgpu_hip_rdna3 | `Linux,X64,gfx1100,persistent-cache` | 10 | 9 | 0s | 0s | 0s | 0 |
+| `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: amdgpu_vulkan_rdna3 | `Linux,X64,rdna3,persistent-cache` | 10 | 9 | 0s | 0s | 0s | 0 |
+| `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_ops :: amdgpu_hip_rdna3_O3 | `Linux,X64,gfx1100` | 10 | 9 | 0s | 0s | 0s | 0 |
+| `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_ops :: amdgpu_vulkan_rdna3_O0 | `Linux,X64,rdna3` | 10 | 9 | 0s | 0s | 0s | 0 |
+| `.github/workflows/pkgci.yml` | Test Torch / test_torch_ops :: amdgpu_hip_gfx1100_O3 | `Linux,X64,gfx1100` | 10 | 9 | 0s | 0s | 0s | 0 |
+| `.github/workflows/pkgci.yml` | Test Torch / test_torch_ops :: amdgpu_vulkan_rdna3_O3 | `Linux,X64,rdna3` | 10 | 9 | 0s | 0s | 0s | 0 |
 | `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: cpu_llvm_task | `self-hosted,persistent-cache,Linux,X64` | 10 | 10 | [15m12s](https://github.com/iree-org/iree/actions/runs/37072908779/job/111058407435) | [2h06m](https://github.com/iree-org/iree/actions/runs/37031857001/job/110925832398) | [2h06m](https://github.com/iree-org/iree/actions/runs/37031857001/job/110925832398) | 1 |
 | `.github/workflows/pkgci.yml` | Test Sharktank / sharktank_tests :: cpu_task | `self-hosted,persistent-cache,Linux,X64` | 10 | 10 | [15m33s](https://github.com/iree-org/iree/actions/runs/37048445138/job/110978403620) | [2h01m](https://github.com/iree-org/iree/actions/runs/37031842464/job/110924458727) | [2h01m](https://github.com/iree-org/iree/actions/runs/37031842464/job/110924458727) | 1 |
 | `.github/workflows/pkgci.yml` | Test ONNX / test_onnx_models :: amdgpu_hip_rdna4 | `Linux,X64,gfx1201,persistent-cache` | 10 | 10 | [11m59s](https://github.com/iree-org/iree/actions/runs/37101946689/job/111144173128) | [1h31m](https://github.com/iree-org/iree/actions/runs/37031842464/job/110924458868) | [1h31m](https://github.com/iree-org/iree/actions/runs/37031842464/job/110924458868) | 1 |
