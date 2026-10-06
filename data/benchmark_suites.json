@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-06T06:27:56.795417Z",
+  "generated_at": "2026-10-06T18:27:32.465264Z",
   "ref": "main",
   "repo": "iree-org/iree",
   "schema_version": 1,
@@ -51,14 +51,14 @@
           "kind": "other",
           "name": "onnx_ops_cpu_llvm_sync_O0.json",
           "path": "onnx_ops_cpu_llvm_sync_O0.json",
-          "size": 19956
+          "size": 19725
         },
         {
           "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_cpu_llvm_sync_O2.json",
           "kind": "other",
           "name": "onnx_ops_cpu_llvm_sync_O2.json",
           "path": "onnx_ops_cpu_llvm_sync_O2.json",
-          "size": 19909
+          "size": 19678
         },
         {
           "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_cuda_O0.json",
@@ -79,21 +79,21 @@
           "kind": "other",
           "name": "onnx_ops_gpu_hip_rdna3_O3.json",
           "path": "onnx_ops_gpu_hip_rdna3_O3.json",
-          "size": 22251
+          "size": 21967
         },
         {
           "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_hip_rdna4_O3.json",
           "kind": "other",
           "name": "onnx_ops_gpu_hip_rdna4_O3.json",
           "path": "onnx_ops_gpu_hip_rdna4_O3.json",
-          "size": 22223
+          "size": 21939
         },
         {
           "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_vulkan_rdna3_O0.json",
           "kind": "other",
           "name": "onnx_ops_gpu_vulkan_rdna3_O0.json",
           "path": "onnx_ops_gpu_vulkan_rdna3_O0.json",
-          "size": 22865
+          "size": 22651
         }
       ],
       "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops",
