@@ -1,6 +1,6 @@
 # iree-ci-monitor
 
-_Updated: 2026-11-14 10:11 PST_ — `iree-org/iree`, queue samples last 10h; queued observations up to 3d
+_Updated: 2026-11-14 14:29 PST_ — `iree-org/iree`, queue samples last 10h; queued observations up to 3d
 
 Automated tracker of GitHub Actions runner health for the IREE project. 
 Each tick, the collector pulls new run+job metadata via the GitHub REST API and the reporter regenerates this page.
@@ -21,7 +21,7 @@ The static benchmark dashboard is generated under [`docs/`](docs/) from PkgCI be
 | `ubuntu-24.04-arm` | github-hosted | 6 | 0 | — | — | 0 | [4s](https://github.com/iree-org/iree/actions/runs/43608975837/job/132489675455) | [7s](https://github.com/iree-org/iree/actions/runs/43607532714/job/132485371281) | — | 6 |
 | `macos-15` | github-hosted | 6 | 0 | — | — | 0 | [3s](https://github.com/iree-org/iree/actions/runs/43608975837/job/132489675357) | [4s](https://github.com/iree-org/iree/actions/runs/43607532714/job/132485371372) | — | 6 |
 | `ubuntu-latest` | github-hosted | 6 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/43603303873/job/132472492512) | [4s](https://github.com/iree-org/iree/actions/runs/43603303670/job/132472491917) | — | 6 |
-| `ubuntu-24.04` | github-hosted | 47 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/43608975833/job/132489590812) | [3s](https://github.com/iree-org/iree/actions/runs/43607532714/job/132485371342) | 0% (0/1) | 44 |
+| `ubuntu-24.04` | github-hosted | 46 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/43608975833/job/132489590812) | [3s](https://github.com/iree-org/iree/actions/runs/43607532714/job/132485371342) | 0% (0/1) | 43 |
 | `windows-2022` | github-hosted | 6 | 0 | — | — | 0 | [2s](https://github.com/iree-org/iree/actions/runs/43608975837/job/132489675381) | [3s](https://github.com/iree-org/iree/actions/runs/43607532714/job/132485371275) | — | 6 |
 | `azure-windows-scale` | ossci | 2 | 0 | — | — | 0 | [1s](https://github.com/iree-org/iree/actions/runs/43607532714/job/132485371431) | [1s](https://github.com/iree-org/iree/actions/runs/43608975837/job/132489675551) | — | 2 |
 | `Linux,X64,iree-w7900` | self-hosted | 2 | 0 | — | — | 0 | 0s | 0s | — | 0 |
@@ -59,8 +59,8 @@ _No queued jobs observed._
 
 | runner | labels | jobs | fail rate | running | last seen |
 |---|---|---:|---:|:---:|---:|
-| `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 336 | 1% (3/336) |  | 1h59m ago |
-| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64` | 392 | 1% (2/392) |  | 2h03m ago |
+| `shark75-ci` | `Linux,X64,gfx1201`, `Linux,X64,gfx1201,persistent-cache`, `Linux,X64,iree-r9700`, `self-hosted,persistent-cache,Linux,X64` | 336 | 1% (3/336) |  | 6h17m ago |
+| `shark55-ci` | `Linux,X64,gfx1100`, `Linux,X64,gfx1100,persistent-cache`, `Linux,X64,rdna3`, `self-hosted,persistent-cache,Linux,X64` | 392 | 1% (2/392) |  | 6h21m ago |
 
 ## Alerts
 
