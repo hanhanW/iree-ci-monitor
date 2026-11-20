@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-20T07:23:36.461301Z",
+  "generated_at": "2026-11-20T20:27:33.973089Z",
   "ref": "main",
   "repo": "iree-org/iree",
   "schema_version": 1,
@@ -93,7 +93,7 @@
           "kind": "other",
           "name": "onnx_ops_gpu_vulkan_rdna3_O0.json",
           "path": "onnx_ops_gpu_vulkan_rdna3_O0.json",
-          "size": 20194
+          "size": 20236
         }
       ],
       "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops",
