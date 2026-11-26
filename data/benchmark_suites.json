@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-25T08:43:38.519420Z",
+  "generated_at": "2026-11-26T08:28:20.213127Z",
   "ref": "main",
   "repo": "iree-org/iree",
   "schema_version": 1,
@@ -72,21 +72,21 @@
           "kind": "other",
           "name": "onnx_ops_gpu_hip_rdna3_O0.json",
           "path": "onnx_ops_gpu_hip_rdna3_O0.json",
-          "size": 22623
+          "size": 20803
         },
         {
           "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_hip_rdna3_O3.json",
           "kind": "other",
           "name": "onnx_ops_gpu_hip_rdna3_O3.json",
           "path": "onnx_ops_gpu_hip_rdna3_O3.json",
-          "size": 19949
+          "size": 17664
         },
         {
           "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_hip_rdna4_O3.json",
           "kind": "other",
           "name": "onnx_ops_gpu_hip_rdna4_O3.json",
           "path": "onnx_ops_gpu_hip_rdna4_O3.json",
-          "size": 19921
+          "size": 17636
         },
         {
           "html_url": "https://github.com/iree-org/iree/tree/main/tests/external/iree-test-suites/onnx_ops/onnx_ops_gpu_vulkan_rdna3_O0.json",
